@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Database
+prisma/*.db
+prisma/*.db-journal
+
+# Env
+.env
+.env.local
+
+# Uploads (keep folder structure, ignore actual files)
+public/uploads/**/*
+!public/uploads/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db

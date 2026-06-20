@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  username           String              @unique
+  email              String              @unique
+  emailVerified      DateTime?
+  passwordHash       String
+  name               String?
+  bio                String?
+  avatarUrl          String?
+  school             String?
+  gpa                String?
+  contactLinks       String?
+  theme              String              @default("minimal")
+  projects           Project[]
+  verificationTokens VerificationToken[]
+  portfolioPages     PortfolioPage[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  tags        String        @default("[]")
+  externalUrl String?
+  isPublic    Boolean       @default(true)
+  date        DateTime?
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files       ProjectFile[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ProjectFile {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  type      String
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PortfolioPage {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String
+  content     String   @default("{}")
+  pageOrder   Int      @default(0)
+  isVisible   Boolean  @default(true)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, slug])
+}

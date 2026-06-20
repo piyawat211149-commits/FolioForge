@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ─── Base ─── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #fff;
+  color: #111;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+/* ─── Portfolio Themes ─── */
+[data-theme="minimal"] {
+  --pt-bg: #ffffff;
+  --pt-bg2: #f8f8f8;
+  --pt-text: #111111;
+  --pt-text2: #666666;
+  --pt-border: #ebebeb;
+  --pt-accent: #000000;
+  --pt-tag-bg: #f0f0f0;
+  --pt-tag-text: #444444;
+}
+
+[data-theme="dark"] {
+  --pt-bg: #0a0a0a;
+  --pt-bg2: #161616;
+  --pt-text: #f0f0f0;
+  --pt-text2: #888888;
+  --pt-border: #222222;
+  --pt-accent: #ffffff;
+  --pt-tag-bg: #1a1a1a;
+  --pt-tag-text: #bbbbbb;
+}
+
+[data-theme="classic"] {
+  --pt-bg: #faf7f2;
+  --pt-bg2: #f0ebe1;
+  --pt-text: #2c2416;
+  --pt-text2: #6b5c45;
+  --pt-border: #d4c5b0;
+  --pt-accent: #4a3728;
+  --pt-tag-bg: #e8ddd0;
+  --pt-tag-text: #5a4535;
+}
+
+/* ─── Print / PDF export ─── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  [data-theme] {
+    --pt-bg: #ffffff;
+    --pt-text: #000000;
+    --pt-text2: #444444;
+    --pt-border: #cccccc;
+    --pt-accent: #000000;
+    --pt-tag-bg: #f0f0f0;
+    --pt-tag-text: #333333;
+  }
+  .portfolio-card { page-break-inside: avoid; margin-bottom: 24px; }
+}
+
+/* ─── Dashboard sidebar nav active ─── */
+.nav-active {
+  background: #f4f4f4;
+  color: #111 !important;
+  font-weight: 600;
+}
+
+/* ─── Tour highlight pulse ─── */
+@keyframes tourPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
+}
+.tour-highlight { animation: tourPulse 1.5s ease infinite; }
