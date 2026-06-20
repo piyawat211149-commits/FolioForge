@@ -171,38 +171,77 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         </section>
 
         {/* ─── HOW IT WORKS ─── */}
-        <section className="bg-gray-50 border-y border-gray-100 py-24 px-6">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-indigo-600 text-xs font-bold tracking-widest uppercase mb-3">วิธีการทำงาน</p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
-                3 ขั้นตอน พอร์ตโฟลิโอพร้อม
+        <section className="relative py-28 px-6 overflow-hidden">
+          {/* background blobs */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-indigo-100/60 blur-3xl" />
+            <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-violet-100/60 blur-3xl" />
+          </div>
+          <div className="relative max-w-5xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full border border-indigo-100 mb-5">
+                ✦ วิธีการทำงาน
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 leading-tight">
+                พอร์ตโฟลิโอพร้อมใน<br className="hidden sm:block" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600"> 3 ขั้นตอน</span>
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-              {steps.map((s, i) => (
-                <div key={s.num} className="relative flex flex-col items-center text-center">
-                  {/* connector line */}
-                  {i < steps.length - 1 && (
-                    <div className="hidden sm:block absolute top-10 left-[58%] w-[84%] h-px bg-gradient-to-r from-gray-200 to-gray-100" />
-                  )}
-                  <div className="relative z-10 w-20 h-20 rounded-2xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-3xl mb-5">
-                    {s.icon}
-                    <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
-                      {i + 1}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative">
+              {/* dashed connector */}
+              <div className="hidden sm:block absolute top-10 left-1/3 right-1/3 h-px border-t-2 border-dashed border-indigo-200 z-0" />
+
+              {[
+                {
+                  step: "01",
+                  icon: "✍️",
+                  title: "บอกข้อมูลตัวเอง",
+                  desc: "กรอกชื่อ โรงเรียน และแนะนำตัวสั้นๆ ใช้เวลาแค่ 2 นาที",
+                  color: "from-orange-50 to-amber-50",
+                  border: "border-orange-100",
+                  badge: "bg-orange-100 text-orange-600",
+                },
+                {
+                  step: "02",
+                  icon: "✦",
+                  title: "AI สร้างให้อัตโนมัติ",
+                  desc: "AI เขียนเนื้อหาและจัดโครงสร้างพอร์ตโฟลิโอระดับมืออาชีพให้ทันที",
+                  color: "from-indigo-50 to-violet-50",
+                  border: "border-indigo-100",
+                  badge: "bg-indigo-100 text-indigo-600",
+                },
+                {
+                  step: "03",
+                  icon: "🌐",
+                  title: "แชร์ให้โลกรู้จัก",
+                  desc: "รับลิงก์พอร์ตโฟลิโอส่วนตัวพร้อมดาวน์โหลด PDF ได้เลย",
+                  color: "from-emerald-50 to-teal-50",
+                  border: "border-emerald-100",
+                  badge: "bg-emerald-100 text-emerald-600",
+                },
+              ].map((s, i) => (
+                <div key={i} className={`relative z-10 rounded-3xl border ${s.border} bg-gradient-to-br ${s.color} p-8 hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}>
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">
+                      {s.icon}
+                    </div>
+                    <span className={`text-xs font-black tracking-widest px-2.5 py-1 rounded-full ${s.badge}`}>
+                      {s.step}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2">{s.title}</h3>
+                  <h3 className="text-lg font-extrabold text-gray-900 mb-2">{s.title}</h3>
                   <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
                 </div>
               ))}
             </div>
+
             <div className="text-center mt-14">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 font-bold text-sm hover:bg-indigo-700 transition-all rounded-xl shadow-md shadow-indigo-500/20"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-4 font-bold text-sm hover:opacity-90 transition-all rounded-2xl shadow-lg shadow-indigo-500/25"
               >
-                Get Started — ฟรี 100% →
+                เริ่มต้นฟรี — ใช้เวลาแค่ 2 นาที →
               </Link>
             </div>
           </div>
