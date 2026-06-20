@@ -117,7 +117,7 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         @keyframes aurora-3{0%,100%{transform:translate(0,0) scale(1.05)}50%{transform:translate(30px,40px) scale(0.95)}}
         @keyframes float-a{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes float-b{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(-4deg)}}
-        @keyframes sq-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @keyframes sq-spin{from{transform:rotate3d(0.5,1,0.25,0deg)}to{transform:rotate3d(0.5,1,0.25,360deg)}}
         .fade-up{opacity:0;transform:translateY(32px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
         .fade-up.in{opacity:1;transform:translateY(0)}
         .d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.30s}
@@ -185,30 +185,36 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             <ParticleBackground dark={dark} />
           </div>
 
-          {/* ── Breaking square animation ── */}
+          {/* ── Breaking square animation (3D) ── */}
           <div
             className="absolute inset-0 z-0 pointer-events-none select-none flex items-center justify-center"
             aria-hidden="true"
-            style={{ opacity: squareOpacity }}
+            style={{ opacity: squareOpacity, perspective: "700px", perspectiveOrigin: "50% 50%" }}
           >
-            {/* Outer spinner wrapper — continuous rotation */}
+            {/* 3D spinning wrapper */}
             <div style={{
-              animation: "sq-spin 18s linear infinite",
-              transform: `rotate(${squareRotation}deg)`,
+              animation: "sq-spin 22s linear infinite",
+              transformStyle: "preserve-3d",
             }}>
               {/* 3×3 grid */}
               <div style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",
                 gap: "clamp(3px, 0.5vw, 6px)",
+                transformStyle: "preserve-3d",
               }}>
                 {CELLS.map(([dx, dy], i) => {
-                  const cellSize = "clamp(52px, 8vw, 118px)"
                   const vw = typeof window !== "undefined" ? window.innerWidth : 800
-                  const scatterX = dx * breakProgress * Math.min(vw * 0.14, 140)
-                  const scatterY = dy * breakProgress * Math.min(vw * 0.14, 140)
-                  const cellRotate = (i - 4) * breakProgress * 35
-                  const cellScale = i === 4 ? (1 - breakProgress * 0.6) : 1
+                  const dist = Math.min(vw * 0.14, 140)
+                  const scatterX = dx * breakProgress * dist
+                  const scatterY = dy * breakProgress * dist
+                  // Z scatter: corners fly toward viewer, edges go back, center shrinks
+                  const tzValues = [120, -60, 120, -60, -180, -60, 120, -60, 120]
+                  const scatterZ = tzValues[i] * breakProgress
+                  const cellRotateZ = (i - 4) * breakProgress * 50
+                  const cellRotateX = [20,-15,20,-15,0,-15,20,-15,20][i] * breakProgress
+                  const cellScale = i === 4 ? (1 - breakProgress * 0.7) : 1
+                  const cellSize = "clamp(50px, 8vw, 115px)"
                   return (
                     <div
                       key={i}
@@ -217,10 +223,13 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
                         height: cellSize,
                         background: squareBaseColor,
                         borderRadius: "clamp(4px, 0.6vw, 8px)",
-                        border: dark ? "1px solid rgba(139,92,246,0.15)" : "1px solid rgba(99,102,241,0.12)",
-                        transform: `translate(${scatterX}px, ${scatterY}px) rotate(${cellRotate}deg) scale(${cellScale})`,
-                        transition: "transform 0.05s linear",
-                        backdropFilter: "blur(1px)",
+                        border: dark ? "1px solid rgba(139,92,246,0.2)" : "1px solid rgba(99,102,241,0.14)",
+                        transform: `translate(${scatterX}px, ${scatterY}px) translateZ(${scatterZ}px) rotateX(${cellRotateX}deg) rotateZ(${cellRotateZ}deg) scale(${cellScale})`,
+                        transition: "transform 0.04s linear",
+                        backdropFilter: "blur(2px)",
+                        boxShadow: dark
+                          ? `0 ${8 + scatterZ * 0.1}px ${20 + scatterZ * 0.2}px rgba(99,102,241,0.12)`
+                          : `0 ${6 + scatterZ * 0.08}px ${16 + scatterZ * 0.15}px rgba(99,102,241,0.08)`,
                       }}
                     />
                   )
