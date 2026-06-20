@@ -19,7 +19,7 @@ export async function sendVerificationEmail(
   }
 
   // ─── Production: send via Resend ───
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: "FolioForge <onboarding@resend.dev>",
     to: email,
     subject: "Verify your FolioForge account",
@@ -41,4 +41,10 @@ export async function sendVerificationEmail(
       </div>
     `,
   })
+
+  if (result.error) {
+    throw new Error(`Resend API error: ${JSON.stringify(result.error)}`)
+  }
+
+  console.log("[email] Resend send success, id:", result.data?.id)
 }
