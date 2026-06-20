@@ -14,12 +14,71 @@ export const translations = {
     "nav.viewPortfolio": "ดูพอร์ตโฟลิโอ ↗",
     "nav.logout": "ออกจากระบบ",
 
-    // Landing
+    // Landing — Nav
+    "landing.cta": "เริ่มสร้างฟรี",
+    "landing.login": "เข้าสู่ระบบ",
+    "landing.toDash": "ไปยัง Dashboard →",
+
+    // Landing — Hero
+    "landing.badge": "✨ AI-Powered · ฟรี 100%",
+    "landing.heroPre": "สร้าง",
+    "landing.heroSuf": "ที่โดดเด่นด้วย AI",
+    "landing.heroDesc": "แค่บอกข้อมูลตัวเอง AI จะเขียน จัดหน้า และออกแบบพอร์ตโฟลิโอระดับมืออาชีพให้ทันที ไม่ต้องเขียนเองแม้แต่บรรทัดเดียว",
+    "landing.startBtn": "เริ่มสร้างพอร์ตโฟลิโอ",
+    "landing.proof1": "ไม่ต้องใช้บัตรเครดิต",
+    "landing.proof2": "ใช้งานได้ทันที",
+    "landing.proof3": "ฟรีตลอด",
+    "landing.scrollDown": "เลื่อนลง",
+    "landing.demo1": "พอร์ตโฟลิโอ",
+    "landing.demo2": "ผลงาน",
+    "landing.demo3": "ตัวตน",
+    "landing.demo4": "อนาคต",
+
+    // Landing — How it works
+    "landing.howBadge": "✦ วิธีการทำงาน",
+    "landing.howTitle": "พอร์ตโฟลิโอพร้อมใน",
+    "landing.howTitleSuf": "3 ขั้นตอน",
+    "landing.howSub": "ง่ายกว่าที่คิด เร็วกว่าที่คาด",
+    "landing.step1Title": "บอกข้อมูลตัวเอง",
+    "landing.step1Desc": "กรอกชื่อ โรงเรียน และแนะนำตัวสั้นๆ ใช้เวลาแค่ 2 นาที",
+    "landing.step2Title": "AI สร้างให้อัตโนมัติ",
+    "landing.step2Desc": "AI เขียนเนื้อหาและจัดโครงสร้างพอร์ตโฟลิโอระดับมืออาชีพให้ทันที",
+    "landing.step3Title": "แชร์ให้โลกรู้จัก",
+    "landing.step3Desc": "รับลิงก์พอร์ตโฟลิโอส่วนตัวพร้อมดาวน์โหลด PDF ได้เลย",
+    "landing.howCta": "เริ่มต้นฟรี — ใช้เวลาแค่ 2 นาที →",
+
+    // Landing — Features
+    "landing.featBadge": "ฟีเจอร์",
+    "landing.featTitle": "ทุกอย่างที่นักเรียนต้องการ",
+    "landing.featSub": "ครบจบในที่เดียว ตั้งแต่สร้างเนื้อหาจนถึงแชร์ให้คนอื่นดู",
+    "landing.feat1Title": "AI เขียนให้ทั้งหมด",
+    "landing.feat1Desc": "Gemini AI เขียนเนื้อหาพอร์ตโฟลิโอระดับมืออาชีพจากข้อมูลที่คุณให้",
+    "landing.feat2Title": "สูงสุด 20 หน้า",
+    "landing.feat2Desc": "กำหนดเองว่าจะมีกี่หน้า แต่ละหน้ามีเนื้อหาอะไร ยืดหยุ่นสุดๆ",
+    "landing.feat3Title": "ภาษาไทย & อังกฤษ",
+    "landing.feat3Desc": "สลับภาษาได้ทันที เหมาะทั้งพอร์ตไทยและส่ง AdCom ต่างประเทศ",
+    "landing.feat4Title": "ดาวน์โหลด PDF",
+    "landing.feat4Desc": "Export เป็น PDF คุณภาพสูงได้ทุกเมื่อ พร้อมส่งอาจารย์หรือสมัครงาน",
+    "landing.feat5Title": "ธีมสวยพร้อมใช้",
+    "landing.feat5Desc": "เลือกธีมหลายแบบ ปรับสีสันให้เข้ากับตัวตนของคุณ",
+    "landing.feat6Title": "ลิงก์ส่วนตัว",
+    "landing.feat6Desc": "ได้ URL พอร์ตโฟลิโอส่วนตัว folioforge.dev/username แชร์ได้เลย",
+
+    // Landing — CTA
+    "landing.ctaBadge": "🚀 เริ่มต้นวันนี้",
+    "landing.ctaTitle": "พร้อมสร้างพอร์ตโฟลิโอ",
+    "landing.ctaTitleSuf": "แล้วหรือยัง?",
+    "landing.ctaDesc": "เริ่มต้นได้ภายใน 2 นาที ไม่ต้องมีความรู้ด้านออกแบบ AI ทำให้ทุกอย่าง",
+    "landing.ctaBtn": "Get Started ฟรี",
+    "landing.ctaNote": "ไม่ต้องใช้บัตรเครดิต · ยกเลิกเมื่อไหร่ก็ได้",
+
+    // Landing — Footer
+    "landing.footerCopy": "© 2026 FolioForge · สร้างพอร์ตโฟลิโอที่โดดเด่นด้วย AI",
+
+    // Legacy keys (kept for other pages)
     "landing.hero1": "สร้างพอร์ตโฟลิโอ",
     "landing.hero2": "ที่โดดเด่นด้วย AI",
     "landing.sub": "ให้ AI ช่วยเขียน จัดหน้า และออกแบบพอร์ตโฟลิโอระดับมืออาชีพ สำหรับนักเรียนทุกคน",
-    "landing.cta": "เริ่มสร้างฟรี",
-    "landing.login": "เข้าสู่ระบบ",
     "landing.f1title": "AI เขียนให้",
     "landing.f1desc": "บอกข้อมูลตัวเอง AI จะเขียนเนื้อหาพอร์ตโฟลิโอให้ทันที",
     "landing.f2title": "กำหนดหน้าเอง",
@@ -125,9 +184,11 @@ export const translations = {
     "tour.4.body": "แก้ไขชื่อ รูปโปรไฟล์ และข้อมูลส่วนตัว",
   },
   en: {
+    // App
     "app.name": "FolioForge",
     "app.tagline": "Build standout portfolios with AI",
 
+    // Nav
     "nav.projects": "Projects",
     "nav.addProject": "Add Project",
     "nav.aiBuilder": "AI Builder",
@@ -135,11 +196,71 @@ export const translations = {
     "nav.viewPortfolio": "View Portfolio ↗",
     "nav.logout": "Log out",
 
+    // Landing — Nav
+    "landing.cta": "Start for free",
+    "landing.login": "Log in",
+    "landing.toDash": "Go to Dashboard →",
+
+    // Landing — Hero
+    "landing.badge": "✨ AI-Powered · 100% Free",
+    "landing.heroPre": "Build a",
+    "landing.heroSuf": "That Stands Out with AI",
+    "landing.heroDesc": "Just share your info and AI will write, structure, and design a professional portfolio instantly — no writing required.",
+    "landing.startBtn": "Start Building",
+    "landing.proof1": "No credit card required",
+    "landing.proof2": "Ready instantly",
+    "landing.proof3": "Always free",
+    "landing.scrollDown": "Scroll",
+    "landing.demo1": "Portfolio",
+    "landing.demo2": "Career",
+    "landing.demo3": "Brand",
+    "landing.demo4": "Future",
+
+    // Landing — How it works
+    "landing.howBadge": "✦ How it works",
+    "landing.howTitle": "Portfolio ready in",
+    "landing.howTitleSuf": "3 steps",
+    "landing.howSub": "Simpler than you think. Faster than you expect.",
+    "landing.step1Title": "Share your info",
+    "landing.step1Desc": "Fill in your name, school, and a short intro. Takes just 2 minutes.",
+    "landing.step2Title": "AI builds it for you",
+    "landing.step2Desc": "AI writes the content and structures a professional portfolio instantly.",
+    "landing.step3Title": "Share with the world",
+    "landing.step3Desc": "Get a personal portfolio link and download as PDF anytime.",
+    "landing.howCta": "Start free — takes just 2 minutes →",
+
+    // Landing — Features
+    "landing.featBadge": "Features",
+    "landing.featTitle": "Everything a student needs",
+    "landing.featSub": "All in one place, from generating content to sharing with the world.",
+    "landing.feat1Title": "AI writes everything",
+    "landing.feat1Desc": "Gemini AI crafts professional portfolio content from your information.",
+    "landing.feat2Title": "Up to 20 pages",
+    "landing.feat2Desc": "Choose how many pages and what each contains — fully flexible.",
+    "landing.feat3Title": "Thai & English",
+    "landing.feat3Desc": "Switch languages instantly, perfect for Thai portfolios and international applications.",
+    "landing.feat4Title": "PDF download",
+    "landing.feat4Desc": "Export as high-quality PDF anytime, ready to share with teachers or recruiters.",
+    "landing.feat5Title": "Beautiful themes",
+    "landing.feat5Desc": "Choose from multiple themes and customize colors to match your style.",
+    "landing.feat6Title": "Personal link",
+    "landing.feat6Desc": "Get your own portfolio URL at folioforge.dev/username to share instantly.",
+
+    // Landing — CTA
+    "landing.ctaBadge": "🚀 Start today",
+    "landing.ctaTitle": "Ready to build your",
+    "landing.ctaTitleSuf": "portfolio?",
+    "landing.ctaDesc": "Get started in 2 minutes. No design skills needed — AI does everything.",
+    "landing.ctaBtn": "Get Started Free",
+    "landing.ctaNote": "No credit card · Cancel anytime",
+
+    // Landing — Footer
+    "landing.footerCopy": "© 2026 FolioForge · Build standout portfolios with AI",
+
+    // Legacy keys
     "landing.hero1": "Build a Portfolio",
     "landing.hero2": "That Stands Out with AI",
     "landing.sub": "Let AI write, structure, and design a professional portfolio for every student.",
-    "landing.cta": "Start for free",
-    "landing.login": "Log in",
     "landing.f1title": "AI Writes for You",
     "landing.f1desc": "Share your info and AI instantly generates polished portfolio content.",
     "landing.f2title": "Define Your Pages",
@@ -147,6 +268,7 @@ export const translations = {
     "landing.f3title": "Thai / English",
     "landing.f3desc": "Switch languages on every page, perfect for Thai and international students.",
 
+    // Auth
     "auth.login": "Log in",
     "auth.register": "Sign up",
     "auth.email": "Email",
@@ -171,6 +293,7 @@ export const translations = {
     "auth.notVerified": "Please verify your email before logging in.",
     "auth.wrongCredentials": "Invalid email or password.",
 
+    // Dashboard
     "dash.myProjects": "My Projects",
     "dash.projects": "projects",
     "dash.noProjects": "No projects yet",
@@ -184,6 +307,7 @@ export const translations = {
     "dash.private": "Private",
     "dash.noImage": "No image",
 
+    // Profile
     "profile.title": "Profile",
     "profile.sub": "This information appears on your public portfolio.",
     "profile.photo": "Profile Photo",
@@ -200,6 +324,7 @@ export const translations = {
     "profile.saving": "Saving...",
     "profile.saved": "✓ Saved",
 
+    // AI Builder
     "ai.title": "AI Portfolio Builder",
     "ai.sub": "Answer a few questions and AI will build your portfolio instantly.",
     "ai.step1": "Basic Info",
@@ -227,6 +352,7 @@ export const translations = {
     "ai.editPages": "Edit Pages",
     "ai.regenerate": "Regenerate",
 
+    // Onboarding
     "tour.skip": "Skip",
     "tour.next": "Next",
     "tour.done": "Get Started!",
