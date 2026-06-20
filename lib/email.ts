@@ -1,6 +1,14 @@
-import { Resend } from "resend"
+import nodemailer from "nodemailer"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+})
 
 export async function sendVerificationEmail(
   email: string,
@@ -9,8 +17,7 @@ export async function sendVerificationEmail(
 ) {
   const verifyUrl = `${baseUrl}/api/verify-email?token=${token}`
 
-  // ─── Development mode: print link to terminal instead of sending email ───
-  if (!process.env.RESEND_API_KEY) {
+  if (!process.env.SMTP_HOST) {
     console.log("\n" + "─".repeat(60))
     console.log("📧  DEV MODE — Email verification link:")
     console.log(verifyUrl)
@@ -18,9 +25,8 @@ export async function sendVerificationEmail(
     return
   }
 
-  // ─── Production: send via Resend ───
-  const result = await resend.emails.send({
-    from: "FolioForge <onboarding@resend.dev>",
+  const info = await transporter.sendMail({
+    from: process.env.SMTP_FROM || "FolioForge <noreply@folioforge.app>",
     to: email,
     subject: "Verify your FolioForge account",
     html: `
@@ -42,9 +48,5 @@ export async function sendVerificationEmail(
     `,
   })
 
-  if (result.error) {
-    throw new Error(`Resend API error: ${JSON.stringify(result.error)}`)
-  }
-
-  console.log("[email] Resend send success, id:", result.data?.id)
+  console.log("[email] Nodemailer send success, messageId:", info.messageId)
 }
