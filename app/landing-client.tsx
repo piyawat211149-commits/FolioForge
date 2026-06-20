@@ -182,6 +182,29 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             <ParticleBackground dark={dark} />
           </div>
 
+          {/* Oversized background letterform — like corentinbernadou.com */}
+          <div
+            className="absolute inset-0 z-0 pointer-events-none select-none flex items-center justify-start overflow-hidden"
+            aria-hidden="true"
+          >
+            <span
+              className={`font-extrabold leading-none tracking-tighter transition-colors duration-500`}
+              style={{
+                fontSize: "clamp(220px, 38vw, 600px)",
+                opacity: dark ? 0.04 : 0.045,
+                color: dark ? "#fff" : "#1e1b4b",
+                transform: `translateX(-4%) translateY(${scrollY * 0.06}px)`,
+                willChange: "transform",
+                fontFamily: "system-ui, -apple-system, sans-serif",
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
+                userSelect: "none",
+              }}
+            >
+              FF
+            </span>
+          </div>
+
           {/* Parallax floating shapes */}
           <div className="absolute top-[10%] right-[6%] w-20 h-20 rounded-3xl opacity-20 blur-sm"
             style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",transform:`translateY(${scrollY*.16}px)`,animation:"float-a 7s ease-in-out infinite"}} />
