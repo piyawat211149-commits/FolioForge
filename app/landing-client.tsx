@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { IntroAnimation } from "@/components/intro-animation"
 import { ParticleBackground } from "@/components/particle-background"
 import { LanguageToggle } from "@/components/language-toggle"
@@ -81,11 +81,24 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
   const feats = useInView()
   const cta = useInView()
 
-  // Breaking square calculations
+  // Breaking cube calculations
   const breakProgress = Math.min(scrollY / 480, 1)
-  const squareRotation = scrollY * 0.08 // deg per px scroll additional
-  const squareBaseColor = dark ? "rgba(99,102,241,0.18)" : "rgba(99,102,241,0.1)"
-  const squareOpacity = Math.max(0, 1 - breakProgress * 0.85)
+  const squareOpacity = Math.max(0, 1 - breakProgress * 0.88)
+  const cubeVW = typeof window !== "undefined" ? window.innerWidth : 800
+  const cubeS = Math.round(Math.min(cubeVW * 0.072, 108))
+  const cubeHalf = cubeS / 2
+  const cubeGap = Math.max(4, Math.round(cubeS * 0.055))
+  const cubeR = Math.round(cubeS * 0.09)
+  const cubeC = {
+    front: dark ? "rgba(139,92,246,0.52)"  : "rgba(99,102,241,0.30)",
+    top:   dark ? "rgba(167,139,250,0.65)" : "rgba(129,140,248,0.44)",
+    right: dark ? "rgba(109,40,217,0.44)"  : "rgba(79,70,229,0.24)",
+    left:  dark ? "rgba(76,29,149,0.34)"   : "rgba(55,48,163,0.18)",
+    bot:   dark ? "rgba(46,16,101,0.26)"   : "rgba(49,46,129,0.12)",
+    back:  dark ? "rgba(30,27,75,0.20)"    : "rgba(30,27,75,0.06)",
+  }
+  const cubeBorder = dark ? "rgba(167,139,250,0.30)" : "rgba(99,102,241,0.20)"
+  const cubeShadow = dark ? "rgba(99,102,241,0.28)" : "rgba(99,102,241,0.10)"
 
   // ── theme tokens ─────────────────────────────────────
   const bg = dark ? "bg-[#07070f]" : "bg-white"
@@ -185,53 +198,54 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             <ParticleBackground dark={dark} />
           </div>
 
-          {/* ── Breaking square animation (3D) ── */}
+          {/* ── 3D Breaking cubes ── */}
           <div
             className="absolute inset-0 z-0 pointer-events-none select-none flex items-center justify-center"
             aria-hidden="true"
-            style={{ opacity: squareOpacity, perspective: "700px", perspectiveOrigin: "50% 50%" }}
+            style={{ opacity: squareOpacity, perspective: "900px", perspectiveOrigin: "50% 46%" }}
           >
-            {/* 3D spinning wrapper */}
-            <div style={{
-              animation: "sq-spin 22s linear infinite",
-              transformStyle: "preserve-3d",
-            }}>
-              {/* 3×3 grid */}
+            <div style={{ animation: "sq-spin 22s linear infinite", transformStyle: "preserve-3d" }}>
               <div style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "clamp(3px, 0.5vw, 6px)",
+                gridTemplateColumns: `repeat(3, ${cubeS}px)`,
+                gap: `${cubeGap}px`,
                 transformStyle: "preserve-3d",
               }}>
                 {CELLS.map(([dx, dy], i) => {
-                  const vw = typeof window !== "undefined" ? window.innerWidth : 800
-                  const dist = Math.min(vw * 0.14, 140)
+                  const dist = Math.min(cubeVW * 0.14, 140)
                   const scatterX = dx * breakProgress * dist
                   const scatterY = dy * breakProgress * dist
-                  // Z scatter: corners fly toward viewer, edges go back, center shrinks
-                  const tzValues = [120, -60, 120, -60, -180, -60, 120, -60, 120]
-                  const scatterZ = tzValues[i] * breakProgress
-                  const cellRotateZ = (i - 4) * breakProgress * 50
-                  const cellRotateX = [20,-15,20,-15,0,-15,20,-15,20][i] * breakProgress
-                  const cellScale = i === 4 ? (1 - breakProgress * 0.7) : 1
-                  const cellSize = "clamp(50px, 8vw, 115px)"
+                  const tzArr   = [110, -55, 110, -55, -170, -55, 110, -55, 110]
+                  const scatterZ = tzArr[i] * breakProgress
+                  const rotZArr = [-45, 0, 45, -30, 0, 30, -45, 0, 45]
+                  const rotXArr = [30, -20, 30, -20, 0, -20, 30, -20, 30]
+                  const rotZ = rotZArr[i] * breakProgress
+                  const rotX = rotXArr[i] * breakProgress
+                  const shadowY  = 8 + Math.abs(scatterZ) * 0.1
+                  const shadowBl = 18 + Math.abs(scatterZ) * 0.25
+                  const f: React.CSSProperties = { position: "absolute", width: "100%", height: "100%", borderRadius: cubeR }
                   return (
-                    <div
-                      key={i}
-                      style={{
-                        width: cellSize,
-                        height: cellSize,
-                        background: squareBaseColor,
-                        borderRadius: "clamp(4px, 0.6vw, 8px)",
-                        border: dark ? "1px solid rgba(139,92,246,0.2)" : "1px solid rgba(99,102,241,0.14)",
-                        transform: `translate(${scatterX}px, ${scatterY}px) translateZ(${scatterZ}px) rotateX(${cellRotateX}deg) rotateZ(${cellRotateZ}deg) scale(${cellScale})`,
-                        transition: "transform 0.04s linear",
-                        backdropFilter: "blur(2px)",
-                        boxShadow: dark
-                          ? `0 ${8 + scatterZ * 0.1}px ${20 + scatterZ * 0.2}px rgba(99,102,241,0.12)`
-                          : `0 ${6 + scatterZ * 0.08}px ${16 + scatterZ * 0.15}px rgba(99,102,241,0.08)`,
-                      }}
-                    />
+                    <div key={i} style={{
+                      width: cubeS, height: cubeS,
+                      position: "relative",
+                      transformStyle: "preserve-3d",
+                      transform: `translate(${scatterX}px,${scatterY}px) translateZ(${scatterZ}px) rotateX(${rotX}deg) rotateZ(${rotZ}deg)`,
+                      transition: "transform 0.04s linear",
+                      filter: `drop-shadow(0 ${shadowY}px ${shadowBl}px ${cubeShadow})`,
+                    }}>
+                      {/* front — brightest, glass */}
+                      <div style={{ ...f, background: cubeC.front, transform: `translateZ(${cubeHalf}px)`, backdropFilter: "blur(4px)", border: `1px solid ${cubeBorder}` }} />
+                      {/* top — light catches it */}
+                      <div style={{ ...f, background: cubeC.top, transform: `rotateX(-90deg) translateZ(${cubeHalf}px)` }} />
+                      {/* right */}
+                      <div style={{ ...f, background: cubeC.right, transform: `rotateY(90deg) translateZ(${cubeHalf}px)` }} />
+                      {/* left — shadow side */}
+                      <div style={{ ...f, background: cubeC.left, transform: `rotateY(-90deg) translateZ(${cubeHalf}px)` }} />
+                      {/* bottom */}
+                      <div style={{ ...f, background: cubeC.bot, transform: `rotateX(90deg) translateZ(${cubeHalf}px)` }} />
+                      {/* back */}
+                      <div style={{ ...f, background: cubeC.back, transform: `rotateY(180deg) translateZ(${cubeHalf}px)` }} />
+                    </div>
                   )
                 })}
               </div>
