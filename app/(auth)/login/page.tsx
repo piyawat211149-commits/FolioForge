@@ -3,6 +3,7 @@ import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
+import { useTheme } from "@/components/theme-provider"
 
 function LoginForm() {
   const router = useRouter()
@@ -115,46 +116,46 @@ function LoginForm() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center p-8 bg-white dark:bg-[#0a0a14] relative overflow-hidden transition-colors duration-300">
         {/* Subtle background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-60" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-violet-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-60" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50 dark:bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-60" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-violet-50 dark:bg-violet-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-60" />
 
         <div className="w-full max-w-sm relative z-10">
           {/* Mobile logo */}
-          <Link href="/" className="lg:hidden block text-gray-900 font-extrabold text-lg mb-8">FolioForge</Link>
+          <Link href="/" className="lg:hidden block text-gray-900 dark:text-white font-extrabold text-lg mb-8">FolioForge</Link>
 
           {verified && (
-            <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-100 text-sm text-green-700 font-medium animate-slide-in">
+            <div className="mb-6 p-4 rounded-xl bg-green-50 dark:bg-green-500/10 border border-green-100 dark:border-green-500/20 text-sm text-green-700 dark:text-green-400 font-medium animate-slide-in">
               ✓ ยืนยันอีเมลสำเร็จ! เข้าสู่ระบบได้เลย
             </div>
           )}
 
           <div className="animate-slide-in">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-1">ยินดีต้อนรับกลับ</h1>
-            <p className="text-gray-400 text-sm mb-8">เข้าสู่ระบบ FolioForge ของคุณ</p>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-1">ยินดีต้อนรับกลับ</h1>
+            <p className="text-gray-400 dark:text-gray-500 text-sm mb-8">เข้าสู่ระบบ FolioForge ของคุณ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="animate-slide-in-d1">
-              <label className="block text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase">อีเมล</label>
+              <label className="block text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 mb-2 uppercase">อีเมล</label>
               <input
                 type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="input-focus w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                className="input-focus w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-white/5 transition-colors"
                 placeholder="you@example.com"
               />
             </div>
             <div className="animate-slide-in-d2">
-              <label className="block text-xs font-bold tracking-widest text-gray-500 mb-2 uppercase">รหัสผ่าน</label>
+              <label className="block text-xs font-bold tracking-widest text-gray-500 dark:text-gray-400 mb-2 uppercase">รหัสผ่าน</label>
               <input
                 type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                className="input-focus w-full border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                className="input-focus w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-3.5 text-sm text-gray-900 dark:text-white placeholder-gray-300 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-white/5 transition-colors"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600 animate-slide-in">{error}</div>
+              <div className="bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl px-4 py-3 text-sm text-red-600 dark:text-red-400 animate-slide-in">{error}</div>
             )}
 
             <div className="animate-slide-in-d3">
@@ -169,10 +170,10 @@ function LoginForm() {
             </div>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 text-center animate-slide-in-d3">
-            <p className="text-sm text-gray-400">
+          <div className="mt-6 pt-6 border-t border-gray-100 dark:border-white/5 text-center animate-slide-in-d3">
+            <p className="text-sm text-gray-400 dark:text-gray-500">
               ยังไม่มีบัญชี?{" "}
-              <Link href="/register" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">สมัครสมาชิกฟรี</Link>
+              <Link href="/register" className="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">สมัครสมาชิกฟรี</Link>
             </p>
           </div>
         </div>

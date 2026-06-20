@@ -5,6 +5,7 @@ import { IntroAnimation } from "@/components/intro-animation"
 import { ParticleBackground } from "@/components/particle-background"
 import { LanguageToggle } from "@/components/language-toggle"
 import { useLang } from "@/components/language-provider"
+import { useTheme } from "@/components/theme-provider"
 
 function useScrollY() {
   const [scrollY, setScrollY] = useState(0)
@@ -41,9 +42,9 @@ const CELLS: [number, number][] = [
 
 export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const { t, lang } = useLang()
+  const { dark, toggle: toggleDark } = useTheme()
   const [wordIdx, setWordIdx] = useState(0)
   const [visible, setVisible] = useState(true)
-  const [dark, setDark] = useState(false)
   const scrollY = useScrollY()
 
   const DEMO_WORDS = [
@@ -52,18 +53,6 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
     t("landing.demo3"),
     t("landing.demo4"),
   ]
-
-  useEffect(() => {
-    const saved = localStorage.getItem("ff-theme")
-    if (saved === "dark") setDark(true)
-  }, [])
-
-  function toggleDark() {
-    setDark(d => {
-      localStorage.setItem("ff-theme", !d ? "dark" : "light")
-      return !d
-    })
-  }
 
   useEffect(() => {
     const id = setInterval(() => {
