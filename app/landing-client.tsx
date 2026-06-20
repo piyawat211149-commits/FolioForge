@@ -32,6 +32,13 @@ function useInView(threshold = 0.12) {
   return { ref, inView }
 }
 
+// 3x3 grid cell directions for breaking apart
+const CELLS: [number, number][] = [
+  [-1.4, -1.4], [ 0,   -1.8], [ 1.4, -1.4],
+  [-1.8,  0  ], [ 0,    0  ], [ 1.8,  0  ],
+  [-1.4,  1.4], [ 0,    1.8], [ 1.4,  1.4],
+]
+
 export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const { t, lang } = useLang()
   const [wordIdx, setWordIdx] = useState(0)
@@ -74,6 +81,12 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
   const feats = useInView()
   const cta = useInView()
 
+  // Breaking square calculations
+  const breakProgress = Math.min(scrollY / 480, 1)
+  const squareRotation = scrollY * 0.08 // deg per px scroll additional
+  const squareBaseColor = dark ? "rgba(99,102,241,0.18)" : "rgba(99,102,241,0.1)"
+  const squareOpacity = Math.max(0, 1 - breakProgress * 0.85)
+
   // ── theme tokens ─────────────────────────────────────
   const bg = dark ? "bg-[#07070f]" : "bg-white"
   const text = dark ? "text-gray-100" : "text-gray-900"
@@ -104,6 +117,7 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         @keyframes aurora-3{0%,100%{transform:translate(0,0) scale(1.05)}50%{transform:translate(30px,40px) scale(0.95)}}
         @keyframes float-a{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-20px) rotate(5deg)}}
         @keyframes float-b{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(-4deg)}}
+        @keyframes sq-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
         .fade-up{opacity:0;transform:translateY(32px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
         .fade-up.in{opacity:1;transform:translateY(0)}
         .d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.30s}
@@ -121,7 +135,6 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
               <div className="absolute top-[-20%] left-[-10%] w-[700px] h-[700px] rounded-full bg-indigo-500/12 blur-[140px]" style={{animation:"aurora-1 16s ease-in-out infinite"}} />
               <div className="absolute top-[35%] right-[-15%] w-[600px] h-[600px] rounded-full bg-violet-500/10 blur-[130px]" style={{animation:"aurora-2 20s ease-in-out infinite"}} />
               <div className="absolute bottom-[-10%] left-[15%] w-[500px] h-[500px] rounded-full bg-indigo-600/8 blur-[120px]" style={{animation:"aurora-3 14s ease-in-out infinite"}} />
-              <div className="absolute top-[65%] right-[30%] w-[300px] h-[300px] rounded-full bg-purple-500/8 blur-[90px]" style={{animation:"aurora-1 18s ease-in-out infinite 3s"}} />
             </>
           ) : (
             <>
@@ -134,9 +147,9 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         </div>
 
         {/* ─── NAV ─── */}
-        <nav className={`sticky top-0 z-50 flex items-center justify-between px-8 py-4 border-b backdrop-blur-md transition-colors duration-500 ${navBg}`}>
-          <span className={`text-xl font-extrabold tracking-tight ${text}`}>FolioForge</span>
-          <div className="flex items-center gap-3">
+        <nav className={`sticky top-0 z-50 flex items-center justify-between px-5 sm:px-8 py-4 border-b backdrop-blur-md transition-colors duration-500 ${navBg}`}>
+          <span className={`text-lg sm:text-xl font-extrabold tracking-tight ${text}`}>FolioForge</span>
+          <div className="flex items-center gap-2 sm:gap-3">
             <LanguageToggle />
             <button
               onClick={toggleDark}
@@ -150,15 +163,15 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
               )}
             </button>
             {isLoggedIn ? (
-              <Link href="/dashboard" className={`text-sm px-5 py-2.5 font-semibold rounded-lg shadow-sm transition-colors ${dark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-black"}`}>
+              <Link href="/dashboard" className={`text-sm px-4 py-2 sm:px-5 sm:py-2.5 font-semibold rounded-lg shadow-sm transition-colors ${dark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-black"}`}>
                 {t("landing.toDash")}
               </Link>
             ) : (
               <>
-                <Link href="/login" className={`text-sm font-medium transition-colors ${dark ? "text-gray-400 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"}`}>
+                <Link href="/login" className={`hidden sm:block text-sm font-medium transition-colors ${dark ? "text-gray-400 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"}`}>
                   {t("landing.login")}
                 </Link>
-                <Link href="/register" className="text-sm bg-indigo-600 text-white px-5 py-2.5 font-semibold hover:bg-indigo-500 transition-colors rounded-lg shadow-sm">
+                <Link href="/register" className="text-sm bg-indigo-600 text-white px-4 py-2 sm:px-5 sm:py-2.5 font-semibold hover:bg-indigo-500 transition-colors rounded-lg shadow-sm">
                   {t("landing.cta")}
                 </Link>
               </>
@@ -172,15 +185,59 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             <ParticleBackground dark={dark} />
           </div>
 
-          {/* Oversized background letterform */}
+          {/* ── Breaking square animation ── */}
+          <div
+            className="absolute inset-0 z-0 pointer-events-none select-none flex items-center justify-center"
+            aria-hidden="true"
+            style={{ opacity: squareOpacity }}
+          >
+            {/* Outer spinner wrapper — continuous rotation */}
+            <div style={{
+              animation: "sq-spin 18s linear infinite",
+              transform: `rotate(${squareRotation}deg)`,
+            }}>
+              {/* 3×3 grid */}
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "clamp(3px, 0.5vw, 6px)",
+              }}>
+                {CELLS.map(([dx, dy], i) => {
+                  const cellSize = "clamp(52px, 8vw, 118px)"
+                  const vw = typeof window !== "undefined" ? window.innerWidth : 800
+                  const scatterX = dx * breakProgress * Math.min(vw * 0.14, 140)
+                  const scatterY = dy * breakProgress * Math.min(vw * 0.14, 140)
+                  const cellRotate = (i - 4) * breakProgress * 35
+                  const cellScale = i === 4 ? (1 - breakProgress * 0.6) : 1
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        width: cellSize,
+                        height: cellSize,
+                        background: squareBaseColor,
+                        borderRadius: "clamp(4px, 0.6vw, 8px)",
+                        border: dark ? "1px solid rgba(139,92,246,0.15)" : "1px solid rgba(99,102,241,0.12)",
+                        transform: `translate(${scatterX}px, ${scatterY}px) rotate(${cellRotate}deg) scale(${cellScale})`,
+                        transition: "transform 0.05s linear",
+                        backdropFilter: "blur(1px)",
+                      }}
+                    />
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* FF background letterform */}
           <div className="absolute inset-0 z-0 pointer-events-none select-none flex items-center justify-start overflow-hidden" aria-hidden="true">
             <span
-              className="font-extrabold leading-none tracking-tighter transition-colors duration-500"
+              className="font-extrabold leading-none transition-colors duration-500"
               style={{
-                fontSize: "clamp(220px, 38vw, 600px)",
-                opacity: dark ? 0.04 : 0.045,
+                fontSize: "clamp(160px, 35vw, 580px)",
+                opacity: dark ? 0.035 : 0.04,
                 color: dark ? "#fff" : "#1e1b4b",
-                transform: `translateX(-4%) translateY(${scrollY * 0.06}px)`,
+                transform: `translateX(-5%) translateY(${scrollY * 0.05}px)`,
                 willChange: "transform",
                 letterSpacing: "-0.04em",
                 lineHeight: 1,
@@ -191,18 +248,19 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             </span>
           </div>
 
-          {/* Parallax floating shapes */}
-          <div className="absolute top-[10%] right-[6%] w-20 h-20 rounded-3xl opacity-20 blur-sm" style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",transform:`translateY(${scrollY*.16}px)`,animation:"float-a 7s ease-in-out infinite"}} />
-          <div className="absolute top-[58%] left-[4%] w-12 h-12 rounded-2xl opacity-25 blur-sm" style={{background:"linear-gradient(135deg,#ec4899,#f43f5e)",transform:`translateY(${scrollY*-.11}px)`,animation:"float-b 9s ease-in-out infinite"}} />
-          <div className="absolute bottom-[22%] right-[13%] w-8 h-8 rounded-xl opacity-30" style={{background:"linear-gradient(135deg,#f59e0b,#f97316)",transform:`translateY(${scrollY*.08}px)`,animation:"float-a 8s ease-in-out infinite 1.5s"}} />
-          <div className="absolute top-[42%] left-[10%] w-5 h-5 rounded-lg opacity-40" style={{background:"linear-gradient(135deg,#10b981,#14b8a6)",transform:`translateY(${scrollY*-.06}px)`,animation:"float-b 6s ease-in-out infinite .5s"}} />
+          {/* Floating orbs — hidden on small mobile */}
+          <div className="hidden sm:block absolute top-[10%] right-[6%] w-16 h-16 sm:w-20 sm:h-20 rounded-3xl opacity-20 blur-sm" style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",transform:`translateY(${scrollY*.16}px)`,animation:"float-a 7s ease-in-out infinite"}} />
+          <div className="hidden sm:block absolute top-[58%] left-[4%] w-10 h-10 sm:w-12 sm:h-12 rounded-2xl opacity-25 blur-sm" style={{background:"linear-gradient(135deg,#ec4899,#f43f5e)",transform:`translateY(${scrollY*-.11}px)`,animation:"float-b 9s ease-in-out infinite"}} />
+          <div className="hidden md:block absolute bottom-[22%] right-[13%] w-8 h-8 rounded-xl opacity-30" style={{background:"linear-gradient(135deg,#f59e0b,#f97316)",transform:`translateY(${scrollY*.08}px)`,animation:"float-a 8s ease-in-out infinite 1.5s"}} />
+          <div className="hidden md:block absolute top-[42%] left-[10%] w-5 h-5 rounded-lg opacity-40" style={{background:"linear-gradient(135deg,#10b981,#14b8a6)",transform:`translateY(${scrollY*-.06}px)`,animation:"float-b 6s ease-in-out infinite .5s"}} />
 
-          <div className="relative z-10 flex flex-col items-center text-center px-6 py-36 max-w-5xl mx-auto w-full">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold tracking-widest rounded-full mb-8 border uppercase ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
+          {/* Hero content */}
+          <div className="relative z-10 flex flex-col items-center text-center px-5 sm:px-6 py-24 sm:py-36 max-w-5xl mx-auto w-full">
+            <div className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-bold tracking-widest rounded-full mb-6 sm:mb-8 border uppercase ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
               {t("landing.badge")}
             </div>
 
-            <h1 className={`text-5xl sm:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 ${text}`}>
+            <h1 className={`text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-5 sm:mb-6 ${text}`}>
               {t("landing.heroPre")}{" "}
               <span
                 className="bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 bg-clip-text text-transparent"
@@ -213,23 +271,23 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
               <br />{t("landing.heroSuf")}
             </h1>
 
-            <p className={`text-lg max-w-xl leading-relaxed mb-10 ${sub}`}>
+            <p className={`text-base sm:text-lg max-w-md sm:max-w-xl leading-relaxed mb-8 sm:mb-10 ${sub}`}>
               {t("landing.heroDesc")}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-16">
+            <div className="flex flex-col sm:flex-row gap-3 mb-10 sm:mb-16 w-full sm:w-auto">
               <Link href="/register"
-                className={`group inline-flex items-center gap-2 px-8 py-4 font-bold text-sm rounded-xl shadow-lg hover:-translate-y-0.5 transition-all ${dark ? "bg-white text-gray-900 hover:bg-gray-100 shadow-white/10" : "bg-gray-900 text-white hover:bg-black shadow-gray-900/15 hover:shadow-gray-900/25"}`}>
+                className={`group inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3.5 sm:py-4 font-bold text-sm rounded-xl shadow-lg hover:-translate-y-0.5 transition-all ${dark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-black shadow-gray-900/15"}`}>
                 <span>{t("landing.startBtn")}</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </Link>
               <Link href="/login"
-                className={`inline-flex items-center gap-2 border px-8 py-4 font-medium text-sm hover:-translate-y-0.5 transition-all rounded-xl ${dark ? "border-white/10 text-gray-400 hover:bg-white/5" : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"}`}>
+                className={`inline-flex items-center justify-center gap-2 border px-7 sm:px-8 py-3.5 sm:py-4 font-medium text-sm rounded-xl transition-all ${dark ? "border-white/10 text-gray-400 hover:bg-white/5" : "border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"}`}>
                 {t("landing.login")}
               </Link>
             </div>
 
-            <div className={`flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-sm ${mutedText}`}>
+            <div className={`flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-xs sm:text-sm ${mutedText}`}>
               <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {t("landing.proof1")}</span>
               <span className={`hidden sm:block ${dark ? "text-white/10" : "text-gray-200"}`}>|</span>
               <span className="flex items-center gap-1.5"><span className="text-green-500">✓</span> {t("landing.proof2")}</span>
@@ -238,45 +296,45 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
             </div>
           </div>
 
-          <div className={`absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-opacity duration-300 ${mutedText}`}
+          <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-opacity duration-300 ${mutedText}`}
             style={{opacity: Math.max(0, 1 - scrollY / 120)}}>
             <span className="text-[10px] tracking-[.2em] uppercase font-semibold">{t("landing.scrollDown")}</span>
-            <div className={`w-px h-10 bg-gradient-to-b ${dark ? "from-white/20" : "from-gray-300"} to-transparent`} />
+            <div className={`w-px h-8 sm:h-10 bg-gradient-to-b ${dark ? "from-white/20" : "from-gray-300"} to-transparent`} />
           </div>
         </section>
 
         {/* ─── HOW IT WORKS ─── */}
-        <section className="relative z-10 py-32 px-6">
+        <section className="relative z-10 py-20 sm:py-32 px-5 sm:px-6">
           <div ref={howItWorks.ref} className="max-w-5xl mx-auto">
-            <div className={`text-center mb-20 fade-up ${howItWorks.inView ? "in" : ""}`}>
-              <span className={`inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full border mb-5 ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
+            <div className={`text-center mb-12 sm:mb-20 fade-up ${howItWorks.inView ? "in" : ""}`}>
+              <span className={`inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full border mb-4 sm:mb-5 ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
                 {t("landing.howBadge")}
               </span>
-              <h2 className={`text-3xl sm:text-5xl font-extrabold leading-tight ${text}`}>
+              <h2 className={`text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight ${text}`}>
                 {t("landing.howTitle")}<br className="hidden sm:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-500"> {t("landing.howTitleSuf")}</span>
               </h2>
-              <p className={`mt-4 text-base max-w-sm mx-auto ${mutedText}`}>{t("landing.howSub")}</p>
+              <p className={`mt-3 sm:mt-4 text-sm sm:text-base max-w-xs sm:max-w-sm mx-auto ${mutedText}`}>{t("landing.howSub")}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 relative">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 relative">
               <div className={`hidden sm:block absolute top-10 left-1/3 right-1/3 h-px border-t-2 border-dashed z-0 ${dark ? "border-indigo-500/20" : "border-indigo-200"}`} />
               {steps.map((s, i) => (
                 <div key={i}
-                  className={`relative z-10 rounded-3xl border bg-gradient-to-br p-8 hover:shadow-xl hover:-translate-y-2 transition-all duration-300 fade-up ${s.delay} ${howItWorks.inView ? "in" : ""} ${dark ? s.darkCard : s.lightCard}`}>
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${dark ? "bg-white/8" : "bg-white shadow-sm"}`}>{s.icon}</div>
+                  className={`relative z-10 rounded-2xl sm:rounded-3xl border bg-gradient-to-br p-6 sm:p-8 hover:shadow-xl hover:-translate-y-1 sm:hover:-translate-y-2 transition-all duration-300 fade-up ${s.delay} ${howItWorks.inView ? "in" : ""} ${dark ? s.darkCard : s.lightCard}`}>
+                  <div className="flex items-start justify-between mb-4 sm:mb-6">
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-xl sm:text-2xl ${dark ? "bg-white/8" : "bg-white shadow-sm"}`}>{s.icon}</div>
                     <span className={`text-xs font-black tracking-widest px-2.5 py-1 rounded-full ${dark ? s.darkBadge : s.lightBadge}`}>{s.step}</span>
                   </div>
-                  <h3 className={`text-lg font-extrabold mb-2 ${text}`}>{t(s.titleKey)}</h3>
+                  <h3 className={`text-base sm:text-lg font-extrabold mb-2 ${text}`}>{t(s.titleKey)}</h3>
                   <p className={`text-sm leading-relaxed ${sub}`}>{t(s.descKey)}</p>
                 </div>
               ))}
             </div>
 
-            <div className={`text-center mt-14 fade-up d4 ${howItWorks.inView ? "in" : ""}`}>
+            <div className={`text-center mt-10 sm:mt-14 fade-up d4 ${howItWorks.inView ? "in" : ""}`}>
               <Link href="/register"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 py-4 font-bold text-sm hover:opacity-90 hover:-translate-y-0.5 transition-all rounded-2xl shadow-lg shadow-indigo-500/25">
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-7 sm:px-8 py-3.5 sm:py-4 font-bold text-sm hover:opacity-90 hover:-translate-y-0.5 transition-all rounded-xl sm:rounded-2xl shadow-lg shadow-indigo-500/25">
                 {t("landing.howCta")}
               </Link>
             </div>
@@ -284,27 +342,27 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         </section>
 
         {/* subtle divider */}
-        <div className="relative z-10 mx-auto max-w-5xl px-6">
+        <div className="relative z-10 mx-auto max-w-5xl px-5 sm:px-6">
           <div className={`h-px w-full bg-gradient-to-r from-transparent ${dark ? "via-white/8" : "via-gray-200"} to-transparent`} />
         </div>
 
         {/* ─── FEATURES ─── */}
-        <section className="relative z-10 py-28 px-6">
+        <section className="relative z-10 py-20 sm:py-28 px-5 sm:px-6">
           <div ref={feats.ref} className="max-w-5xl mx-auto">
-            <div className={`text-center mb-16 fade-up ${feats.inView ? "in" : ""}`}>
-              <p className="text-indigo-500 text-xs font-bold tracking-widest uppercase mb-3">{t("landing.featBadge")}</p>
-              <h2 className={`text-3xl sm:text-4xl font-extrabold ${text}`}>{t("landing.featTitle")}</h2>
-              <p className={`mt-3 max-w-lg mx-auto ${sub}`}>{t("landing.featSub")}</p>
+            <div className={`text-center mb-10 sm:mb-16 fade-up ${feats.inView ? "in" : ""}`}>
+              <p className="text-indigo-500 text-xs font-bold tracking-widest uppercase mb-2 sm:mb-3">{t("landing.featBadge")}</p>
+              <h2 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold ${text}`}>{t("landing.featTitle")}</h2>
+              <p className={`mt-2 sm:mt-3 max-w-xs sm:max-w-lg mx-auto text-sm sm:text-base ${sub}`}>{t("landing.featSub")}</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {features.map((f, i) => {
                 const delays = ["d1","d2","d3","d4","d5","d6"]
                 return (
                   <div key={i}
-                    className={`rounded-2xl border p-6 hover:shadow-lg hover:-translate-y-1.5 transition-all duration-300 fade-up ${delays[i]??""} ${feats.inView ? "in" : ""} ${dark ? f.dark_ : f.light}`}>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4 ${dark ? f.iDark : f.iLight}`}>{f.icon}</div>
-                    <h3 className={`text-sm font-bold mb-1.5 ${text}`}>{t(f.titleKey)}</h3>
-                    <p className={`text-sm leading-relaxed ${sub}`}>{t(f.descKey)}</p>
+                    className={`rounded-xl sm:rounded-2xl border p-5 sm:p-6 hover:shadow-lg hover:-translate-y-1 sm:hover:-translate-y-1.5 transition-all duration-300 fade-up ${delays[i]??""} ${feats.inView ? "in" : ""} ${dark ? f.dark_ : f.light}`}>
+                    <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center text-base sm:text-lg mb-3 sm:mb-4 ${dark ? f.iDark : f.iLight}`}>{f.icon}</div>
+                    <h3 className={`text-sm font-bold mb-1 sm:mb-1.5 ${text}`}>{t(f.titleKey)}</h3>
+                    <p className={`text-xs sm:text-sm leading-relaxed ${sub}`}>{t(f.descKey)}</p>
                   </div>
                 )
               })}
@@ -313,41 +371,41 @@ export function LandingClient({ isLoggedIn = false }: { isLoggedIn?: boolean }) 
         </section>
 
         {/* subtle divider */}
-        <div className="relative z-10 mx-auto max-w-5xl px-6">
+        <div className="relative z-10 mx-auto max-w-5xl px-5 sm:px-6">
           <div className={`h-px w-full bg-gradient-to-r from-transparent ${dark ? "via-white/8" : "via-gray-200"} to-transparent`} />
         </div>
 
         {/* ─── FINAL CTA ─── */}
-        <section className="relative z-10 py-28 px-6">
+        <section className="relative z-10 py-20 sm:py-28 px-5 sm:px-6">
           <div ref={cta.ref} className="max-w-2xl mx-auto text-center">
             <div className={`fade-up ${cta.inView ? "in" : ""}`}>
-              <div className={`inline-flex items-center gap-2 px-4 py-1.5 text-xs font-bold tracking-widest rounded-full border mb-6 uppercase ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
+              <div className={`inline-flex items-center gap-2 px-4 py-1.5 text-xs font-bold tracking-widest rounded-full border mb-5 sm:mb-6 uppercase ${dark ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" : "bg-indigo-50 text-indigo-600 border-indigo-100"}`}>
                 {t("landing.ctaBadge")}
               </div>
-              <h2 className={`text-3xl sm:text-5xl font-extrabold leading-tight mb-5 ${text}`}>
+              <h2 className={`text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight mb-4 sm:mb-5 ${text}`}>
                 {t("landing.ctaTitle")}<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-500">{t("landing.ctaTitleSuf")}</span>
               </h2>
-              <p className={`mb-10 text-base leading-relaxed max-w-sm mx-auto ${sub}`}>{t("landing.ctaDesc")}</p>
+              <p className={`mb-8 sm:mb-10 text-sm sm:text-base leading-relaxed max-w-xs sm:max-w-sm mx-auto ${sub}`}>{t("landing.ctaDesc")}</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/register"
-                  className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-9 py-4 font-bold text-sm hover:opacity-90 hover:-translate-y-0.5 transition-all rounded-2xl shadow-xl shadow-indigo-500/30">
+                  className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-8 sm:px-9 py-3.5 sm:py-4 font-bold text-sm hover:opacity-90 hover:-translate-y-0.5 transition-all rounded-xl sm:rounded-2xl shadow-xl shadow-indigo-500/30">
                   <span>{t("landing.ctaBtn")}</span>
                   <span className="group-hover:translate-x-1 transition-transform">→</span>
                 </Link>
                 <Link href="/login"
-                  className={`inline-flex items-center justify-center gap-2 border px-9 py-4 font-medium text-sm transition-all rounded-2xl ${dark ? "border-white/10 text-gray-400 hover:bg-white/5" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                  className={`inline-flex items-center justify-center gap-2 border px-8 sm:px-9 py-3.5 sm:py-4 font-medium text-sm transition-all rounded-xl sm:rounded-2xl ${dark ? "border-white/10 text-gray-400 hover:bg-white/5" : "border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
                   {t("landing.login")}
                 </Link>
               </div>
-              <p className={`text-xs mt-5 ${mutedText}`}>{t("landing.ctaNote")}</p>
+              <p className={`text-xs mt-4 sm:mt-5 ${mutedText}`}>{t("landing.ctaNote")}</p>
             </div>
           </div>
         </section>
 
         {/* ─── FOOTER ─── */}
-        <footer className={`relative z-10 border-t py-8 px-8 transition-colors duration-500 ${dark ? "border-white/8" : "border-gray-100"}`}>
-          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <footer className={`relative z-10 border-t py-7 sm:py-8 px-5 sm:px-8 transition-colors duration-500 ${dark ? "border-white/8" : "border-gray-100"}`}>
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left">
             <span className={`text-sm font-bold ${text}`}>FolioForge</span>
             <p className={`text-xs ${mutedText}`}>{t("landing.footerCopy")}</p>
             <div className={`flex gap-4 text-xs ${mutedText}`}>
