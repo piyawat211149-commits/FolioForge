@@ -37,13 +37,7 @@ export async function POST(req: NextRequest) {
     })
 
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000"
-    console.log("[register] RESEND_API_KEY set:", !!process.env.RESEND_API_KEY)
-    try {
-      await sendVerificationEmail(email, token, baseUrl)
-      console.log("[register] Email sent to:", email)
-    } catch (emailErr) {
-      console.error("[register] Email send failed:", emailErr)
-    }
+    await sendVerificationEmail(email, token, baseUrl)
 
     return NextResponse.json({ success: true })
   } catch (err) {
