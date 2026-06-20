@@ -2,6 +2,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useTheme } from "@/components/theme-provider"
 
 interface ProjectFile {
   id: string; url: string; filename: string; type: string
@@ -13,6 +14,7 @@ interface InitialData {
 }
 
 export function ProjectForm({ initialData }: { initialData?: InitialData }) {
+  const { dark } = useTheme()
   const router = useRouter()
   const isEdit = !!initialData?.id
 
@@ -75,8 +77,8 @@ export function ProjectForm({ initialData }: { initialData?: InitialData }) {
     }
   }
 
-  const inputCls = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-  const labelCls = "block text-xs font-semibold tracking-wide text-gray-500 mb-1.5 uppercase"
+  const inputCls = `w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all ${dark ? "border-white/10 bg-white/5 text-white placeholder-gray-500" : "border-gray-200 bg-white text-gray-900 placeholder-gray-300"}`
+  const labelCls = `block text-xs font-semibold tracking-wide mb-1.5 uppercase ${dark ? "text-gray-400" : "text-gray-500"}`
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -123,52 +125,56 @@ export function ProjectForm({ initialData }: { initialData?: InitialData }) {
             {files.map((f) => (
               <div key={f.id} className="relative group">
                 {f.type === "image" ? (
-                  <div className="w-20 h-20 relative border border-gray-200 rounded-xl overflow-hidden">
+                  <div className={`w-20 h-20 relative border rounded-xl overflow-hidden ${dark ? "border-white/10" : "border-gray-200"}`}>
                     <Image src={f.url} alt={f.filename} fill className="object-cover" />
                   </div>
                 ) : (
-                  <div className="w-20 h-20 border border-gray-200 rounded-xl flex items-center justify-center bg-gray-50 px-2">
-                    <span className="text-xs text-gray-400 text-center leading-tight truncate w-full">📄 {f.filename}</span>
+                  <div className={`w-20 h-20 border rounded-xl flex items-center justify-center px-2 ${dark ? "border-white/10 bg-white/5" : "border-gray-200 bg-gray-50"}`}>
+                    <span className={`text-xs text-center leading-tight truncate w-full ${dark ? "text-gray-400" : "text-gray-400"}`}>📄 {f.filename}</span>
                   </div>
                 )}
                 <button type="button" onClick={() => removeFile(f.id)}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white border border-gray-200 rounded-full text-gray-400 hover:text-red-500 text-xs hidden group-hover:flex items-center justify-center shadow-sm">
+                  className={`absolute -top-1.5 -right-1.5 w-5 h-5 border rounded-full text-xs hidden group-hover:flex items-center justify-center shadow-sm ${
+                    dark ? "bg-gray-800 border-white/10 text-gray-400 hover:text-red-400" : "bg-white border-gray-200 text-gray-400 hover:text-red-500"
+                  }`}>
                   ×
                 </button>
               </div>
             ))}
           </div>
         )}
-        <label className="cursor-pointer inline-flex items-center gap-2 border border-dashed border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-400 hover:text-gray-700 hover:border-gray-300 transition-colors">
+        <label className={`cursor-pointer inline-flex items-center gap-2 border border-dashed rounded-xl px-4 py-2.5 text-sm transition-colors ${
+          dark ? "border-white/10 text-gray-500 hover:text-gray-300 hover:border-white/20" : "border-gray-200 text-gray-400 hover:text-gray-700 hover:border-gray-300"
+        }`}>
           {uploading ? "กำลังอัปโหลด..." : "+ อัปโหลดไฟล์"}
           <input type="file" multiple accept="image/*,application/pdf" className="hidden" onChange={handleFileUpload} />
         </label>
-        <p className="text-xs text-gray-300 mt-2">JPG, PNG, GIF, WEBP, PDF — สูงสุด 10MB ต่อไฟล์</p>
+        <p className={`text-xs mt-2 ${dark ? "text-gray-600" : "text-gray-300"}`}>JPG, PNG, GIF, WEBP, PDF — สูงสุด 10MB ต่อไฟล์</p>
       </div>
 
       {/* Public toggle */}
       <div className="flex items-center gap-3">
         <label className="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" name="isPublic" checked={form.isPublic} onChange={handleChange} className="sr-only peer" />
-          <div className="w-10 h-6 bg-gray-200 peer-checked:bg-indigo-500 rounded-full transition-colors relative">
+          <div className={`w-10 h-6 rounded-full transition-colors relative ${form.isPublic ? "bg-indigo-500" : dark ? "bg-white/10" : "bg-gray-200"}`}>
             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.isPublic ? "translate-x-5" : "translate-x-1"}`} />
           </div>
         </label>
-        <span className="text-sm text-gray-500">
+        <span className={`text-sm ${dark ? "text-gray-400" : "text-gray-500"}`}>
           {form.isPublic ? "สาธารณะ — แสดงในพอร์ตโฟลิโอ" : "ส่วนตัว — มองเห็นเฉพาะคุณ"}
         </span>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>
+        <div className={`rounded-xl px-4 py-3 text-sm ${dark ? "bg-red-500/10 border border-red-500/20 text-red-400" : "bg-red-50 border border-red-100 text-red-600"}`}>{error}</div>
       )}
 
       <div className="flex items-center gap-4 pt-2">
         <button type="submit" disabled={saving || uploading}
-          className="bg-gray-900 text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-black transition-colors disabled:opacity-50">
+          className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 shadow-lg shadow-indigo-500/20 hover:-translate-y-0.5 duration-300">
           {saving ? "กำลังบันทึก..." : isEdit ? "บันทึกการเปลี่ยนแปลง" : "เพิ่มโปรเจกต์"}
         </button>
-        <button type="button" onClick={() => router.back()} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">
+        <button type="button" onClick={() => router.back()} className={`text-sm transition-colors ${dark ? "text-gray-500 hover:text-gray-300" : "text-gray-400 hover:text-gray-700"}`}>
           ยกเลิก
         </button>
       </div>
