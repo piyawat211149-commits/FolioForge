@@ -10,6 +10,7 @@ export async function GET() {
     where: { id: session.user.id },
     select: { id:true, username:true, email:true, name:true, bio:true, avatarUrl:true, school:true, gpa:true, contactLinks:true, theme:true },
   })
+  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 })
   return NextResponse.json(user)
 }
 

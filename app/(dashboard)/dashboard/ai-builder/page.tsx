@@ -157,6 +157,7 @@ export default function AIBuilderPage() {
     setGenerating(true)
     try {
       const profileRes = await fetch("/api/profile")
+      if (!profileRes.ok) { setError("ไม่สามารถโหลดโปรไฟล์ได้ กรุณา logout แล้ว login ใหม่"); setGenerating(false); return }
       const profile = await profileRes.json()
       setUsername(profile.username)
 
