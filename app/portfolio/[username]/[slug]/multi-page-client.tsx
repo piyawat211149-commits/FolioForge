@@ -271,9 +271,9 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
               แก้ไขใน Canva
             </p>
             {[
-              { icon: "📄", label: "Portfolio Document", url: "https://www.canva.com/design/DAHNOV-Wbtk/edit" },
-              { icon: "📝", label: "Portfolio แบบ 2", url: "https://www.canva.com/design/DAHNOUpEGYE/edit" },
-              { icon: "🎤", label: "Presentation 9 สไลด์", url: "https://www.canva.com/design/DAHNOab9W3M/edit" },
+              { icon: "📄", label: "Portfolio Document", url: "https://www.canva.com/design/DAHNOj5J-OU/edit" },
+              { icon: "📝", label: "Portfolio แบบ 2", url: "https://www.canva.com/design/DAHNOtMrrd0/edit" },
+              { icon: "🎤", label: "Presentation 10 สไลด์", url: "https://www.canva.com/design/DAHNOkLwRFE/edit" },
             ].map((item) => (
               <a
                 key={item.label}
