@@ -79,6 +79,7 @@ export function PortfolioClient({ user, projects }: { user: User; projects: Proj
         .pf-img-zoom:hover{transform:scale(1.08)}
         .pf-tag{transition:all .25s ease}
         .pf-tag:hover{transform:translateY(-2px)}
+        .pf-gradient-text{-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent;color:transparent}
       `}</style>
 
       {/* Lightbox */}
@@ -204,15 +205,15 @@ export function PortfolioClient({ user, projects }: { user: User; projects: Proj
                   </div>
                 )}
                 <div>
-                  <h1 style={{
-                    fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800, letterSpacing: "-0.04em",
-                    lineHeight: 1.1, margin: 0,
-                    background: isDark
-                      ? "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 30%, #a5b4fc 60%, #818cf8 100%)"
-                      : "linear-gradient(135deg, #312e81 0%, #4338ca 30%, #6366f1 60%, #818cf8 100%)",
-                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}>
+                  <h1
+                    className="pf-gradient-text"
+                    style={{
+                      fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800, letterSpacing: "-0.04em",
+                      lineHeight: 1.1, margin: 0,
+                      background: isDark
+                        ? "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 30%, #a5b4fc 60%, #818cf8 100%)"
+                        : "linear-gradient(135deg, #312e81 0%, #4338ca 30%, #6366f1 60%, #818cf8 100%)",
+                    }}>
                     {user.name}
                   </h1>
                   {(user.school || user.gpa) && (

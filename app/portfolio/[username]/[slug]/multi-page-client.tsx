@@ -68,6 +68,7 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
         .mp-fade-up{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
         .mp-fade-up.in{opacity:1;transform:translateY(0)}
         .mp-d1{transition-delay:.08s}.mp-d2{transition-delay:.18s}.mp-d3{transition-delay:.28s}
+        .mp-gradient-text{-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent;color:transparent}
       `}</style>
 
       {/* Aurora background */}
@@ -116,13 +117,12 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
             <span style={{ color: border, fontSize: "0.75rem" }}>·</span>
             <Link
               href={`/portfolio/${user.username}`}
+              className="mp-gradient-text"
               style={{
                 fontWeight: 800, fontSize: "1rem", letterSpacing: "-0.03em", textDecoration: "none",
                 background: isDark
                   ? "linear-gradient(135deg, #e0e7ff, #a5b4fc)"
                   : "linear-gradient(135deg, #312e81, #6366f1)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
               }}
             >
               {user.name}
@@ -238,15 +238,15 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
                 </div>
               )}
               <div>
-                <h1 style={{
-                  fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800,
-                  letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0,
-                  background: isDark
-                    ? "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 30%, #a5b4fc 60%, #818cf8 100%)"
-                    : "linear-gradient(135deg, #312e81 0%, #4338ca 30%, #6366f1 60%, #818cf8 100%)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}>
+                <h1
+                  className="mp-gradient-text"
+                  style={{
+                    fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800,
+                    letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0,
+                    background: isDark
+                      ? "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 30%, #a5b4fc 60%, #818cf8 100%)"
+                      : "linear-gradient(135deg, #312e81 0%, #4338ca 30%, #6366f1 60%, #818cf8 100%)",
+                  }}>
                   {user.name}
                 </h1>
                 {user.school && (
@@ -281,15 +281,15 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
         >
           {/* Page heading */}
           {currentContent.heading && (
-            <h2 style={{
-              fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 800,
-              letterSpacing: "-0.03em", marginBottom: 28, lineHeight: 1.15,
-              background: isDark
-                ? "linear-gradient(135deg, #e0e7ff, #a5b4fc)"
-                : "linear-gradient(135deg, #312e81, #6366f1)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>
+            <h2
+              className="mp-gradient-text"
+              style={{
+                fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 800,
+                letterSpacing: "-0.03em", marginBottom: 28, lineHeight: 1.15,
+                background: isDark
+                  ? "linear-gradient(135deg, #e0e7ff, #a5b4fc)"
+                  : "linear-gradient(135deg, #312e81, #6366f1)",
+              }}>
               {currentContent.heading}
             </h2>
           )}
