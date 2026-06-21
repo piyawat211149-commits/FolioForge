@@ -64,6 +64,21 @@ export default async function DashboardPage() {
         </Link>
       )}
 
+      {/* Portfolio Images */}
+      {pageCount > 0 && (
+        <Link
+          href="/dashboard/portfolio-images"
+          className="flex items-center gap-5 mb-8 p-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/[0.04] hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5 transition-all duration-300 group"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-2xl flex-shrink-0 shadow-md shadow-amber-500/20">📷</div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-gray-900 dark:text-white">จัดการรูปภาพพอร์ตโฟลิโอ</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">อัพโหลดรูปเกียรติบัตร กิจกรรม ผลงาน ลงในแต่ละหน้า</p>
+          </div>
+          <span className="text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all text-lg">→</span>
+        </Link>
+      )}
+
       {/* Canva Templates */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">

@@ -7,11 +7,13 @@ import { LanguageToggle } from "@/components/language-toggle"
 import { getFacultyTheme, type FacultyTheme } from "@/lib/faculty-themes"
 
 interface PageItem { id: string; title: string; slug: string; content: PageContent }
+interface PageImage { url: string; filename: string }
 interface PageContent {
   heading?: string
   body?: string
   highlights?: string[]
   extra?: string
+  images?: PageImage[]
   _facultyTheme?: string
 }
 interface User { name: string; username: string; avatarUrl: string; bio: string; school: string; theme: string }
@@ -45,6 +47,7 @@ const THEME_LABELS: Record<string, string> = { minimal: "Minimal", dark: "Dark",
 export function MultiPagePortfolioClient({ user, pages, currentSlug, currentContent }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [lightbox, setLightbox] = useState<string | null>(null)
   const [theme, setThemeState] = useState(user.theme || "minimal")
   const isDark = theme === "dark"
 
@@ -84,6 +87,22 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
 
   return (
     <div style={{ minHeight: "100vh", background: bg, color: text, fontFamily: "var(--font-geist-sans, sans-serif)", position: "relative", overflow: "hidden" }}>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.9)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out", padding: 24 }}
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            style={{ position: "absolute", top: 20, right: 20, width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "none", color: "white", fontSize: "1.2rem", cursor: "pointer" }}
+          >
+            ✕
+          </button>
+          <img src={lightbox} alt="" style={{ maxWidth: "90%", maxHeight: "90%", objectFit: "contain", borderRadius: 12 }} />
+        </div>
+      )}
 
       <style>{`
         @keyframes aurora-1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(60px,-40px) scale(1.1)}66%{transform:translate(-30px,20px) scale(0.95)}}
@@ -465,6 +484,34 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
                   </div>
                 )}
 
+                {/* Images gallery */}
+                {currentContent.images && currentContent.images.length > 0 && (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: currentContent.images.length === 1 ? "1fr" : "repeat(auto-fit, minmax(200px, 1fr))",
+                    gap: 10, marginBottom: 16,
+                  }}>
+                    {currentContent.images.map((img, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          ...cardStyle,
+                          position: "relative", overflow: "hidden", cursor: "pointer",
+                          aspectRatio: currentContent.images!.length === 1 ? "16/9" : "4/3",
+                        }}
+                        onClick={() => setLightbox(img.url)}
+                      >
+                        <Image
+                          src={img.url}
+                          alt={img.filename}
+                          fill
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Highlights — as numbered feature cards */}
                 {highlights.length > 0 && (
                   <div style={{
@@ -665,6 +712,17 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
                   {p}
                 </p>
               ))}
+
+              {/* Images in print */}
+              {c.images?.length ? (
+                <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: c.images.length === 1 ? "1fr" : "1fr 1fr", gap: 8 }}>
+                  {c.images.map((img: PageImage, idx: number) => (
+                    <div key={idx} style={{ borderRadius: 8, overflow: "hidden", border: "1px solid #e5e7eb" }}>
+                      <Image src={img.url} alt={img.filename} width={400} height={250} style={{ width: "100%", height: "auto", objectFit: "cover", display: "block" }} />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
 
               {/* Highlights as numbered list */}
               {c.highlights?.length ? (
