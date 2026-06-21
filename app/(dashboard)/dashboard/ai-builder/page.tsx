@@ -4,9 +4,13 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useLang } from "@/components/language-provider"
 import { useTheme } from "@/components/theme-provider"
+import { FACULTY_THEMES, detectFacultyTheme, getFacultyTheme } from "@/lib/faculty-themes"
 
 interface PageDef { name: string; notes: string }
-interface BasicInfo { name: string; school: string; grade: string; bio: string; lang: "th" | "en" }
+interface BasicInfo {
+  name: string; school: string; grade: string; bio: string; lang: "th" | "en"
+  targetFaculty: string; gpax: string; activities: string; awards: string; skills: string; goals: string
+}
 
 const MAX_PAGES = 20
 
@@ -129,17 +133,23 @@ export default function AIBuilderPage() {
   const { dark } = useTheme()
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const [basic, setBasic] = useState<BasicInfo>({ name: "", school: "", grade: "", bio: "", lang: "th" })
+  const [basic, setBasic] = useState<BasicInfo>({
+    name: "", school: "", grade: "", bio: "", lang: "th",
+    targetFaculty: "", gpax: "", activities: "", awards: "", skills: "", goals: "",
+  })
   const [pages, setPages] = useState<PageDef[]>([
-    { name: "เกี่ยวกับฉัน", notes: "" },
-    { name: "ทักษะ", notes: "" },
-    { name: "ผลงาน", notes: "" },
-    { name: "ติดต่อ", notes: "" },
+    { name: "แนะนำตัว / SOP", notes: "" },
+    { name: "ประวัติการศึกษา", notes: "" },
+    { name: "กิจกรรม", notes: "" },
+    { name: "ผลงาน & เกียรติบัตร", notes: "" },
+    { name: "ทักษะ & ความสามารถพิเศษ", notes: "" },
+    { name: "เป้าหมาย & ติดต่อ", notes: "" },
   ])
   const [generating, setGenerating] = useState(false)
   const [done, setDone] = useState(false)
   const [error, setError] = useState("")
   const [username, setUsername] = useState("")
+  const [facultyThemeId, setFacultyThemeId] = useState("default")
 
   function addPage() {
     if (pages.length >= MAX_PAGES) return
@@ -164,7 +174,7 @@ export default function AIBuilderPage() {
       const genRes = await fetch("/api/ai-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ basicInfo: basic, pages, lang: basic.lang }),
+        body: JSON.stringify({ basicInfo: basic, pages, lang: basic.lang, facultyTheme: facultyThemeId }),
       })
       const genData = await genRes.json()
       if (!genRes.ok) { setError(genData.error || "AI generation failed"); setGenerating(false); return }
@@ -314,7 +324,7 @@ export default function AIBuilderPage() {
               <label className={labelCls}>{f.label}</label>
               <input
                 type="text"
-                value={basic[f.key as keyof BasicInfo]}
+                value={basic[f.key as keyof BasicInfo] as string}
                 onChange={e => setBasic(b => ({ ...b, [f.key]: e.target.value }))}
                 placeholder={f.placeholder}
                 className={inputCls}
@@ -331,6 +341,121 @@ export default function AIBuilderPage() {
               className={`${inputCls} resize-none`}
             />
           </div>
+
+          {/* New: Portfolio-specific fields */}
+          <div className={`border-t pt-5 ${dark ? "border-white/5" : "border-gray-100"}`}>
+            <p className={`text-xs font-bold tracking-widest uppercase mb-4 ${dark ? "text-gray-500" : "text-gray-400"}`}>ข้อมูลสำหรับพอร์ต (ยิ่งละเอียด AI ยิ่งเขียนได้ดี)</p>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>มหาวิทยาลัย / คณะเป้าหมาย</label>
+                  <input
+                    type="text"
+                    value={basic.targetFaculty}
+                    onChange={e => {
+                      const val = e.target.value
+                      setBasic(b => ({ ...b, targetFaculty: val }))
+                      setFacultyThemeId(detectFacultyTheme(val))
+                    }}
+                    placeholder="เช่น จุฬาฯ คณะวิศวกรรมศาสตร์"
+                    className={inputCls}
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>GPAX</label>
+                  <input
+                    type="text"
+                    value={basic.gpax}
+                    onChange={e => setBasic(b => ({ ...b, gpax: e.target.value }))}
+                    placeholder="เช่น 3.85"
+                    className={inputCls}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>สีธีมพอร์ตโฟลิโอ (ตามคณะ)</label>
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                  {FACULTY_THEMES.map(ft => (
+                    <button
+                      key={ft.id}
+                      type="button"
+                      onClick={() => setFacultyThemeId(ft.id)}
+                      className="group relative"
+                    >
+                      <div
+                        className={`h-10 rounded-xl border-2 transition-all duration-200 ${
+                          facultyThemeId === ft.id
+                            ? "scale-105 shadow-lg"
+                            : "hover:scale-105 opacity-70 hover:opacity-100"
+                        }`}
+                        style={{
+                          background: ft.gradient,
+                          borderColor: facultyThemeId === ft.id ? ft.accentDark : "transparent",
+                        }}
+                      />
+                      <p className={`text-[9px] mt-1 text-center leading-tight font-medium truncate ${
+                        dark ? "text-gray-500" : "text-gray-400"
+                      } ${facultyThemeId === ft.id ? (dark ? "!text-white" : "!text-gray-900") : ""}`}>
+                        {ft.label.split("(")[0].trim()}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+                {facultyThemeId !== "default" && (
+                  <p className={`text-xs mt-2 font-medium ${dark ? "text-gray-400" : "text-gray-500"}`}>
+                    ✓ เลือกธีม: <span style={{ color: getFacultyTheme(facultyThemeId).accentDark }}>{getFacultyTheme(facultyThemeId).label}</span>
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className={labelCls}>กิจกรรมสำคัญ</label>
+                <textarea
+                  value={basic.activities}
+                  onChange={e => setBasic(b => ({ ...b, activities: e.target.value }))}
+                  placeholder="เช่น ประธานชมรมวิทยาศาสตร์, จิตอาสาสอนน้อง, ค่ายวิชาการ, แข่งโอลิมปิก"
+                  rows={2}
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+
+              <div>
+                <label className={labelCls}>เกียรติบัตร / รางวัล</label>
+                <textarea
+                  value={basic.awards}
+                  onChange={e => setBasic(b => ({ ...b, awards: e.target.value }))}
+                  placeholder="เช่น เหรียญทอง สอวน. ฟิสิกส์, รางวัลชนะเลิศ Science Project"
+                  rows={2}
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+
+              <div>
+                <label className={labelCls}>ทักษะพิเศษ</label>
+                <textarea
+                  value={basic.skills}
+                  onChange={e => setBasic(b => ({ ...b, skills: e.target.value }))}
+                  placeholder="เช่น เขียนโปรแกรม Python, เล่นกีตาร์, พูดภาษาอังกฤษ-จีน, ถ่ายภาพ"
+                  rows={2}
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+
+              <div>
+                <label className={labelCls}>เป้าหมายอาชีพ / แรงบันดาลใจ</label>
+                <textarea
+                  value={basic.goals}
+                  onChange={e => setBasic(b => ({ ...b, goals: e.target.value }))}
+                  placeholder="เช่น อยากเป็นวิศวกร AI เพราะสนใจเรื่อง Machine Learning ตั้งแต่ ม.4"
+                  rows={2}
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className={labelCls}>{t("ai.lang")}</label>
             <div className="flex gap-3">
@@ -442,26 +567,19 @@ export default function AIBuilderPage() {
           <div className={cardCls}>
             <p className={`text-xs font-bold tracking-widest uppercase mb-5 ${dark ? "text-gray-500" : "text-gray-400"}`}>ตรวจสอบก่อนสร้าง</p>
             <div className="grid grid-cols-2 gap-4 mb-5 text-sm">
-              <div>
-                <p className={`text-xs mb-1 ${dark ? "text-gray-500" : "text-gray-400"}`}>ชื่อ</p>
-                <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{basic.name}</p>
-              </div>
-              {basic.school && (
-                <div>
-                  <p className={`text-xs mb-1 ${dark ? "text-gray-500" : "text-gray-400"}`}>โรงเรียน</p>
-                  <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{basic.school}</p>
+              {[
+                { label: "ชื่อ", value: basic.name },
+                { label: "โรงเรียน", value: basic.school },
+                { label: "ชั้นปี", value: basic.grade },
+                { label: "คณะเป้าหมาย", value: basic.targetFaculty },
+                { label: "GPAX", value: basic.gpax },
+                { label: "ภาษา", value: basic.lang === "th" ? "🇹🇭 Thai" : "🇬🇧 English" },
+              ].filter(f => f.value).map(f => (
+                <div key={f.label}>
+                  <p className={`text-xs mb-1 ${dark ? "text-gray-500" : "text-gray-400"}`}>{f.label}</p>
+                  <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{f.value}</p>
                 </div>
-              )}
-              {basic.grade && (
-                <div>
-                  <p className={`text-xs mb-1 ${dark ? "text-gray-500" : "text-gray-400"}`}>ชั้นปี</p>
-                  <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{basic.grade}</p>
-                </div>
-              )}
-              <div>
-                <p className={`text-xs mb-1 ${dark ? "text-gray-500" : "text-gray-400"}`}>ภาษา</p>
-                <p className={`font-semibold ${dark ? "text-white" : "text-gray-900"}`}>{basic.lang === "th" ? "🇹🇭 Thai" : "🇬🇧 English"}</p>
-              </div>
+              ))}
             </div>
             <div className={`border-t pt-4 ${dark ? "border-white/5" : "border-gray-50"}`}>
               <p className={`text-xs mb-3 ${dark ? "text-gray-500" : "text-gray-400"}`}>{pages.length} หน้าที่จะสร้าง</p>
