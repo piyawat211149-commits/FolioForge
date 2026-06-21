@@ -45,14 +45,25 @@ const THEME_LABELS: Record<string, string> = { minimal: "Minimal", dark: "Dark",
 export function MultiPagePortfolioClient({ user, pages, currentSlug, currentContent }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [theme, setTheme] = useState(user.theme || "minimal")
+  const [theme, setThemeState] = useState(user.theme || "minimal")
   const isDark = theme === "dark"
+
+  function setTheme(t: string) {
+    setThemeState(t)
+    try { localStorage.setItem("ff-portfolio-theme", t) } catch {}
+  }
 
   const headerView = useInView()
   const contentView = useInView()
   const navView = useInView()
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+    try {
+      const saved = localStorage.getItem("ff-portfolio-theme")
+      if (saved && THEMES.includes(saved)) setThemeState(saved)
+    } catch {}
+  }, [])
 
   const ftId = pages[0]?.content?._facultyTheme || "default"
   const ft: FacultyTheme = getFacultyTheme(ftId)
@@ -86,16 +97,19 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
         .mp-gradient-text{-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent;color:transparent}
         @media print{
           .no-print{display:none!important}
+          .mp-aurora,.mp-particles{display:none!important}
+          .mp-screen-content{display:none!important}
           .print-all-pages{display:block!important}
           .print-all-pages .print-page{page-break-after:always}
           .print-all-pages .print-page:last-child{page-break-after:auto}
           body{background:white!important;color:black!important}
+          *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
         }
         .print-all-pages{display:none}
       `}</style>
 
       {/* Aurora background */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+      <div className="mp-aurora" style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
         {isDark ? (
           <>
             <div style={{ position: "absolute", top: "-20%", left: "-10%", width: 700, height: 700, borderRadius: "50%", background: "rgba(99,102,241,0.12)", filter: "blur(140px)", animation: "aurora-1 16s ease-in-out infinite" }} />
@@ -112,7 +126,7 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
       </div>
 
       {/* Particle background */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+      <div className="mp-particles" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
         <ParticleBackground dark={isDark} />
       </div>
 
@@ -251,6 +265,45 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
             >
               PDF ทุกหน้า ↓
             </button>
+
+            {/* Canva buttons */}
+            <p style={{ fontSize: "0.65rem", fontWeight: 700, color: textSub, textTransform: "uppercase", letterSpacing: "0.15em", marginTop: 16, marginBottom: 8 }}>
+              แก้ไขใน Canva
+            </p>
+            {[
+              { icon: "📄", label: "Portfolio Document", url: "https://www.canva.com/design/DAHNOV-Wbtk/edit" },
+              { icon: "📝", label: "Portfolio แบบ 2", url: "https://www.canva.com/design/DAHNOUpEGYE/edit" },
+              { icon: "🎤", label: "Presentation 9 สไลด์", url: "https://www.canva.com/design/DAHNOab9W3M/edit" },
+            ].map((item) => (
+              <a
+                key={item.label}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, width: "100%",
+                  fontSize: "0.75rem", padding: "9px 12px", borderRadius: 10, cursor: "pointer",
+                  fontWeight: 600, transition: "all 0.25s", border: "none", textDecoration: "none",
+                  marginBottom: 4,
+                  background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+                  color: text,
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = accentSoft
+                  e.currentTarget.style.color = accent
+                  e.currentTarget.style.transform = "translateY(-1px)"
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"
+                  e.currentTarget.style.color = text
+                  e.currentTarget.style.transform = "translateY(0)"
+                }}
+              >
+                <span>{item.icon}</span>
+                <span style={{ flex: 1 }}>{item.label}</span>
+                <span style={{ fontSize: "0.65rem", opacity: 0.5 }}>↗</span>
+              </a>
+            ))}
           </div>
 
           {/* FolioForge link */}
@@ -298,7 +351,7 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
       </button>
 
       {/* Main content (screen view - current page only) */}
-      <main className="no-print" style={{ position: "relative", zIndex: 10, maxWidth: 800, margin: "0 auto", padding: "64px 24px 96px" }}>
+      <main className="mp-screen-content" style={{ position: "relative", zIndex: 10, maxWidth: 800, margin: "0 auto", padding: "64px 24px 96px" }}>
 
         {/* User header on first page */}
         {pages[0]?.slug === currentSlug && (
@@ -345,74 +398,131 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
           </div>
         )}
 
-        {/* Page content card */}
+        {/* Page content — section-specific layouts */}
         <div
           ref={contentView.ref}
           className={`mp-fade-up ${mounted && contentView.inView ? "in" : ""}`}
-          style={{
-            borderRadius: 24, overflow: "hidden",
-            border: `1px solid ${border}`,
-            background: cardBg,
-            backdropFilter: "blur(12px)",
-            padding: "40px 36px",
-            boxShadow: isDark ? "0 4px 32px rgba(0,0,0,0.3)" : "0 4px 32px rgba(0,0,0,0.04)",
-          }}
         >
-          {currentContent.heading && (
-            <h2
-              className="mp-gradient-text"
-              style={{
-                fontSize: "clamp(1.5rem, 4vw, 2.5rem)", fontWeight: 800,
-                letterSpacing: "-0.03em", marginBottom: 28, lineHeight: 1.15,
-                background: gradientText,
-              }}>
-              {currentContent.heading}
-            </h2>
-          )}
+          {(() => {
+            const slug = currentSlug
+            const heading = currentContent.heading || ""
+            const body = currentContent.body || ""
+            const highlights = currentContent.highlights || []
+            const extra = currentContent.extra || ""
+            const paragraphs = body.split(/\n\n+/).filter(Boolean)
+            const pageIcon = slug.includes("intro") || slug.includes("sop") || slug.includes("about") ? "✦"
+              : slug.includes("edu") ? "🎓"
+              : slug.includes("activ") ? "🏆"
+              : slug.includes("achiev") || slug.includes("certif") || slug.includes("award") ? "🏅"
+              : slug.includes("skill") || slug.includes("capab") ? "⚡"
+              : slug.includes("goal") || slug.includes("contact") || slug.includes("future") ? "🎯"
+              : "📄"
 
-          {currentContent.body && (
-            <div style={{ color: textSub, lineHeight: 1.9, fontSize: "1rem", marginBottom: 32, whiteSpace: "pre-wrap" }}>
-              {currentContent.body}
-            </div>
-          )}
+            const cardStyle: React.CSSProperties = {
+              borderRadius: 20, border: `1px solid ${border}`, background: cardBg,
+              backdropFilter: "blur(12px)",
+              boxShadow: isDark ? "0 2px 24px rgba(0,0,0,0.25)" : "0 2px 24px rgba(0,0,0,0.03)",
+            }
 
-          {currentContent.highlights?.length ? (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 32 }}>
-              {currentContent.highlights.map((h: string, i: number) => (
-                <span key={i} style={{
-                  padding: "8px 20px", borderRadius: 100,
-                  border: `1px solid ${border}`,
-                  fontSize: "0.8125rem", fontWeight: 600,
-                  color: accent, background: accentSoft,
-                  transition: "all 0.25s",
-                  animation: `fade-in-up 0.5s cubic-bezier(.22,1,.36,1) ${i * 0.06}s both`,
-                }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = "translateY(-3px)"
-                    e.currentTarget.style.boxShadow = `0 4px 12px ${isDark ? "rgba(129,140,248,0.15)" : "rgba(99,102,241,0.1)"}`
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = "translateY(0)"
-                    e.currentTarget.style.boxShadow = "none"
-                  }}
-                >
-                  {h}
-                </span>
-              ))}
-            </div>
-          ) : null}
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {currentContent.extra && (
-            <div style={{
-              color: textSub, lineHeight: 1.8, fontSize: "0.9375rem",
-              borderLeft: `3px solid ${accent}`,
-              margin: "32px 0 0",
-              background: accentSoft,
-              padding: "20px 24px", borderRadius: "0 16px 16px 0",
-            }}>
-              {currentContent.extra}
-            </div>
-          )}
+                {/* Section header */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 4 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "1.2rem", background: accentSoft, border: `1px solid ${border}`,
+                  }}>
+                    {pageIcon}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    {heading && (
+                      <h2
+                        className="mp-gradient-text"
+                        style={{
+                          fontSize: "clamp(1.3rem, 3.5vw, 2rem)", fontWeight: 800,
+                          letterSpacing: "-0.03em", lineHeight: 1.2, margin: 0,
+                          background: gradientText,
+                        }}>
+                        {heading}
+                      </h2>
+                    )}
+                  </div>
+                </div>
+
+                {/* Body text */}
+                {paragraphs.length > 0 && (
+                  <div style={{ ...cardStyle, padding: "32px 32px" }}>
+                    {paragraphs.map((p, i) => (
+                      <p key={i} style={{ color: i === 0 ? text : textSub, lineHeight: 1.9, fontSize: i === 0 ? "1rem" : "0.95rem", margin: i === 0 ? 0 : "16px 0 0" }}>
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {/* Highlights — as numbered feature cards */}
+                {highlights.length > 0 && (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: highlights.length <= 3 ? "repeat(auto-fit, minmax(200px, 1fr))" : "repeat(auto-fit, minmax(180px, 1fr))",
+                    gap: 12,
+                  }}>
+                    {highlights.map((h, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          ...cardStyle,
+                          padding: "20px 20px",
+                          display: "flex", alignItems: "flex-start", gap: 14,
+                          transition: "all 0.3s",
+                          animation: `fade-in-up 0.5s cubic-bezier(.22,1,.36,1) ${i * 0.08}s both`,
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.transform = "translateY(-3px)"
+                          e.currentTarget.style.boxShadow = `0 8px 24px ${isDark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.06)"}`
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.transform = "translateY(0)"
+                          e.currentTarget.style.boxShadow = isDark ? "0 2px 24px rgba(0,0,0,0.25)" : "0 2px 24px rgba(0,0,0,0.03)"
+                        }}
+                      >
+                        <div style={{
+                          width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: "0.7rem", fontWeight: 800,
+                          background: accentSoft, color: accent,
+                          border: `1px solid ${border}`,
+                        }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <p style={{ fontSize: "0.8rem", fontWeight: 600, color: text, margin: 0, lineHeight: 1.5 }}>
+                          {h}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Extra — styled quote block */}
+                {extra && (
+                  <div style={{
+                    ...cardStyle,
+                    padding: "28px 32px",
+                    display: "flex", gap: 16, alignItems: "flex-start",
+                    borderLeft: `3px solid ${accent}`,
+                    borderRadius: "0 20px 20px 0",
+                  }}>
+                    <span style={{ fontSize: "2rem", lineHeight: 1, color: accent, opacity: 0.5, flexShrink: 0, marginTop: -4 }}>"</span>
+                    <p style={{ color: textSub, lineHeight: 1.8, fontSize: "0.9rem", fontStyle: "italic", margin: 0 }}>
+                      {extra}
+                    </p>
+                  </div>
+                )}
+
+              </div>
+            )
+          })()}
         </div>
 
         {/* Page navigation */}
@@ -505,49 +615,70 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
       </main>
 
       {/* ── Print view: ALL pages rendered ── */}
-      <div className="print-all-pages" style={{ background: "#fff", color: "#111" }}>
-        {/* Header */}
-        <div style={{ padding: "48px 48px 32px", borderBottom: "1px solid #e5e7eb" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 12 }}>
+      <div className="print-all-pages" style={{ background: "#ffffff", color: "#111", position: "relative", zIndex: 100 }}>
+        {/* Cover / Header */}
+        <div style={{ padding: "56px 48px 40px", borderBottom: `3px solid ${ft.accentDark}`, position: "relative" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: ft.gradient }} />
+          <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 16 }}>
             {user.avatarUrl && (
-              <div style={{ width: 56, height: 56, borderRadius: "50%", overflow: "hidden", border: "2px solid #e5e7eb", flexShrink: 0 }}>
-                <Image src={user.avatarUrl} alt={user.name} width={56} height={56} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+              <div style={{ width: 64, height: 64, borderRadius: "50%", overflow: "hidden", border: `3px solid ${ft.accentDark}`, flexShrink: 0 }}>
+                <Image src={user.avatarUrl} alt={user.name} width={64} height={64} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
               </div>
             )}
             <div>
-              <h1 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.03em", margin: 0, color: "#111" }}>{user.name}</h1>
-              {user.school && <p style={{ fontSize: "0.85rem", color: "#666", margin: "4px 0 0" }}>{user.school}</p>}
+              <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.03em", margin: 0, color: ft.accentDark }}>{user.name}</h1>
+              {user.school && <p style={{ fontSize: "0.9rem", color: "#666", margin: "4px 0 0" }}>{user.school}</p>}
             </div>
           </div>
           {user.bio && <p style={{ fontSize: "0.9rem", color: "#555", lineHeight: 1.7, maxWidth: 600, margin: 0 }}>{user.bio}</p>}
         </div>
 
         {/* All pages */}
-        {pages.map((pg) => {
+        {pages.map((pg, pageIdx) => {
           const c = pg.content
+          const pIcon = pg.slug.includes("intro") || pg.slug.includes("sop") ? "✦"
+            : pg.slug.includes("edu") ? "🎓" : pg.slug.includes("activ") ? "🏆"
+            : pg.slug.includes("achiev") || pg.slug.includes("certif") ? "🏅"
+            : pg.slug.includes("skill") ? "⚡" : pg.slug.includes("goal") ? "🎯" : "📄"
+          const bodyParagraphs = (c.body || "").split(/\n\n+/).filter(Boolean)
+
           return (
             <div key={pg.id} className="print-page" style={{ padding: "40px 48px" }}>
-              {c.heading && (
-                <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 16, color: "#111", borderBottom: "2px solid #6366f1", paddingBottom: 8, display: "inline-block" }}>
-                  {c.heading}
-                </h2>
-              )}
-              {c.body && (
-                <div style={{ fontSize: "0.9rem", color: "#444", lineHeight: 1.8, marginBottom: 20, whiteSpace: "pre-wrap" }}>
-                  {c.body}
-                </div>
-              )}
+              {/* Page section header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+                <span style={{ fontSize: "1.2rem" }}>{pIcon}</span>
+                {c.heading && (
+                  <h2 style={{ fontSize: "1.4rem", fontWeight: 800, letterSpacing: "-0.02em", margin: 0, color: ft.accentDark }}>
+                    {c.heading}
+                  </h2>
+                )}
+              </div>
+              <div style={{ height: 2, background: ft.gradient, marginBottom: 20, borderRadius: 1 }} />
+
+              {/* Body paragraphs */}
+              {bodyParagraphs.map((p, i) => (
+                <p key={i} style={{ fontSize: "0.88rem", color: i === 0 ? "#333" : "#555", lineHeight: 1.85, margin: i === 0 ? "0 0 12px" : "12px 0 0" }}>
+                  {p}
+                </p>
+              ))}
+
+              {/* Highlights as numbered list */}
               {c.highlights?.length ? (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-                  {c.highlights.map((h, i) => (
-                    <span key={i} style={{ padding: "4px 14px", borderRadius: 100, border: "1px solid #d1d5db", fontSize: "0.8rem", fontWeight: 500, color: "#374151" }}>
-                      {h}
-                    </span>
+                <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 24px" }}>
+                  {c.highlights.map((h: string, i: number) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 0" }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, background: ft.accentSoft, color: ft.accentDark, fontSize: "0.65rem", fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, border: `1px solid ${ft.accentDark}20` }}>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 500, color: "#374151", lineHeight: 1.4 }}>{h}</span>
+                    </div>
                   ))}
                 </div>
               ) : null}
+
+              {/* Extra quote */}
               {c.extra && (
-                <div style={{ fontSize: "0.85rem", color: "#555", lineHeight: 1.7, borderLeft: "3px solid #6366f1", paddingLeft: 16, background: "#f5f3ff", padding: "12px 16px", borderRadius: "0 8px 8px 0" }}>
+                <div style={{ marginTop: 20, fontSize: "0.82rem", color: "#555", lineHeight: 1.7, borderLeft: `3px solid ${ft.accentDark}`, padding: "10px 16px", background: `${ft.accentSoft}`, borderRadius: "0 8px 8px 0" }}>
                   {c.extra}
                 </div>
               )}
@@ -556,8 +687,8 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
         })}
 
         {/* Print footer */}
-        <div style={{ textAlign: "center", padding: "24px 48px", borderTop: "1px solid #e5e7eb", fontSize: "0.7rem", color: "#9ca3af" }}>
-          Built with FolioForge
+        <div style={{ textAlign: "center", padding: "20px 48px", borderTop: `2px solid ${ft.accentDark}`, fontSize: "0.7rem", color: "#9ca3af" }}>
+          Built with <span style={{ fontWeight: 700, color: ft.accentDark }}>FolioForge</span>
         </div>
       </div>
     </div>

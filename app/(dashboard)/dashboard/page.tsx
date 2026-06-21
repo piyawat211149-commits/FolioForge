@@ -64,6 +64,62 @@ export default async function DashboardPage() {
         </Link>
       )}
 
+      {/* Canva Templates */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-base font-bold text-gray-900 dark:text-white">สร้างใน Canva</h2>
+          <span className="text-xs text-gray-400 dark:text-gray-600">กดเลือก template แล้วแก้ไขได้เลย</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            {
+              icon: "📄",
+              title: "Portfolio Document",
+              desc: "เอกสาร A4 ส่งอาจารย์",
+              color: "from-blue-500 to-indigo-500",
+              shadow: "shadow-blue-500/20",
+              url: "https://www.canva.com/design/DAHNN4ifxBo/edit",
+            },
+            {
+              icon: "📝",
+              title: "Resume / CV",
+              desc: "สรุป 1 หน้า",
+              color: "from-emerald-500 to-teal-500",
+              shadow: "shadow-emerald-500/20",
+              url: "https://www.canva.com/design/DAHNN74LlUE/edit",
+            },
+            {
+              icon: "🎤",
+              title: "Presentation",
+              desc: "สไลด์นำเสนอสัมภาษณ์",
+              color: "from-violet-500 to-purple-500",
+              shadow: "shadow-violet-500/20",
+              url: "https://www.canva.com/design/DAHNN46GYuQ/edit",
+            },
+          ].map((item) => (
+            <a
+              key={item.title}
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`group relative overflow-hidden rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/[0.04] p-5 hover:shadow-lg ${item.shadow} hover:-translate-y-1 transition-all duration-300`}
+            >
+              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${item.color} opacity-[0.07] rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500`} />
+              <div className="flex items-center gap-4">
+                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-xl flex-shrink-0 shadow-md ${item.shadow}`}>
+                  {item.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-gray-900 dark:text-white">{item.title}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{item.desc}</p>
+                </div>
+                <span className="text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all text-sm">↗</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* Section header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-base font-bold text-gray-900 dark:text-white">โปรเจกต์ของฉัน</h2>
