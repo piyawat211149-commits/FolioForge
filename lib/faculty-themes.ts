@@ -158,6 +158,61 @@ const FACULTY_KEYWORDS: Record<string, string[]> = {
   technology: ["เทคโนโลยี", "technology", "it", "คอมพิวเตอร์", "computer", "สารสนเทศ", "ดิจิทัล", "digital", "ซอฟต์แวร์", "software"],
 }
 
+const UNIVERSITY_KEYWORDS: Record<string, string> = {
+  "จุฬา": "chula", "chula": "chula",
+  "ธรรมศาสตร์": "tu", "thammasat": "tu", "มธ": "tu",
+  "เกษตร": "ku", "kasetsart": "ku", "มก": "ku",
+  "มหิดล": "mahidol", "mahidol": "mahidol",
+  "ศิลปากร": "su", "silpakorn": "su",
+  "เชียงใหม่": "cmu", "chiangmai": "cmu", "มช": "cmu",
+  "ขอนแก่น": "kku", "khonkaen": "kku", "มข": "kku",
+  "สงขลา": "psu", "prince of songkla": "psu", "มอ": "psu",
+  "ลาดกระบัง": "kmitl", "kmitl": "kmitl", "สจล": "kmitl",
+  "บางมด": "kmutt", "พระจอมเกล้าธนบุรี": "kmutt", "มจธ": "kmutt",
+  "พระนครเหนือ": "kmutnb", "มจพ": "kmutnb",
+  "แม่ฟ้าหลวง": "mfu",
+  "บูรพา": "buu",
+  "นเรศวร": "nu",
+  "มศว": "swu", "ศรีนครินทรวิโรฒ": "swu",
+  "รังสิต": "rsu",
+  "กรุงเทพ": "bu",
+  "หอการค้า": "utcc",
+  "อัสสัมชัญ": "au", "abac": "au",
+}
+
+export interface UniversityTheme {
+  id: string
+  name: string
+  primary: string
+  secondary: string
+}
+
+export const UNIVERSITY_THEMES: UniversityTheme[] = [
+  { id: "chula", name: "จุฬาลงกรณ์", primary: "#E91E8C", secondary: "#FFFFFF" },
+  { id: "tu", name: "ธรรมศาสตร์", primary: "#FFD700", secondary: "#CC0000" },
+  { id: "ku", name: "เกษตรศาสตร์", primary: "#006633", secondary: "#FFFFFF" },
+  { id: "mahidol", name: "มหิดล", primary: "#1E3A8A", secondary: "#FFD700" },
+  { id: "su", name: "ศิลปากร", primary: "#006400", secondary: "#FFFFFF" },
+  { id: "cmu", name: "เชียงใหม่", primary: "#7B2D8E", secondary: "#FFD700" },
+  { id: "kku", name: "ขอนแก่น", primary: "#8B0000", secondary: "#FFD700" },
+  { id: "psu", name: "สงขลานครินทร์", primary: "#0066CC", secondary: "#FFFFFF" },
+  { id: "kmitl", name: "ลาดกระบัง", primary: "#FF6600", secondary: "#FFFFFF" },
+  { id: "kmutt", name: "บางมด", primary: "#CC0000", secondary: "#FF6600" },
+  { id: "kmutnb", name: "พระนครเหนือ", primary: "#8B4513", secondary: "#FFD700" },
+  { id: "mfu", name: "แม่ฟ้าหลวง", primary: "#CC0000", secondary: "#FFD700" },
+  { id: "swu", name: "ศรีนครินทรวิโรฒ", primary: "#800020", secondary: "#808080" },
+]
+
+export function detectUniversity(text: string): UniversityTheme | null {
+  const lower = text.toLowerCase()
+  for (const [keyword, uniId] of Object.entries(UNIVERSITY_KEYWORDS)) {
+    if (lower.includes(keyword.toLowerCase())) {
+      return UNIVERSITY_THEMES.find(u => u.id === uniId) || null
+    }
+  }
+  return null
+}
+
 export function detectFacultyTheme(text: string): string {
   const lower = text.toLowerCase()
   for (const [id, keywords] of Object.entries(FACULTY_KEYWORDS)) {

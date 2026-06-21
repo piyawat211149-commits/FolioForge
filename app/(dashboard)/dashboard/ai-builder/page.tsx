@@ -138,12 +138,16 @@ export default function AIBuilderPage() {
     targetFaculty: "", gpax: "", activities: "", awards: "", skills: "", goals: "",
   })
   const [pages, setPages] = useState<PageDef[]>([
-    { name: "แนะนำตัว / SOP", notes: "" },
+    { name: "หน้าปก", notes: "ชื่อ-นามสกุล, โรงเรียน, คณะ/มหาวิทยาลัยที่สมัคร" },
+    { name: "คำนำ / SOP", notes: "" },
+    { name: "ประวัติส่วนตัว", notes: "" },
     { name: "ประวัติการศึกษา", notes: "" },
     { name: "กิจกรรม", notes: "" },
-    { name: "ผลงาน & เกียรติบัตร", notes: "" },
+    { name: "ผลงาน", notes: "" },
+    { name: "เกียรติบัตร & รางวัล", notes: "" },
     { name: "ทักษะ & ความสามารถพิเศษ", notes: "" },
-    { name: "เป้าหมาย & ติดต่อ", notes: "" },
+    { name: "เป้าหมาย & แรงบันดาลใจ", notes: "" },
+    { name: "ขอบคุณ", notes: "" },
   ])
   const [generating, setGenerating] = useState(false)
   const [done, setDone] = useState(false)

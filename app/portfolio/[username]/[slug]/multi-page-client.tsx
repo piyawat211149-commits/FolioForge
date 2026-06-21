@@ -410,12 +410,16 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
             const highlights = currentContent.highlights || []
             const extra = currentContent.extra || ""
             const paragraphs = body.split(/\n\n+/).filter(Boolean)
-            const pageIcon = slug.includes("intro") || slug.includes("sop") || slug.includes("about") ? "✦"
+            const pageIcon = slug.includes("cover") ? "📋"
+              : slug.includes("intro") || slug.includes("sop") ? "✦"
+              : slug.includes("personal") || slug.includes("about") ? "👤"
               : slug.includes("edu") ? "🎓"
               : slug.includes("activ") ? "🏆"
-              : slug.includes("achiev") || slug.includes("certif") || slug.includes("award") ? "🏅"
+              : slug.includes("project") || slug.includes("work") ? "💼"
+              : slug.includes("certif") || slug.includes("award") || slug.includes("achiev") ? "🏅"
               : slug.includes("skill") || slug.includes("capab") ? "⚡"
-              : slug.includes("goal") || slug.includes("contact") || slug.includes("future") ? "🎯"
+              : slug.includes("goal") || slug.includes("future") || slug.includes("inspir") ? "🎯"
+              : slug.includes("thank") || slug.includes("contact") ? "🙏"
               : "📄"
 
             const cardStyle: React.CSSProperties = {
