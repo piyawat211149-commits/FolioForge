@@ -79,6 +79,27 @@ export default async function DashboardPage() {
         </Link>
       )}
 
+      {/* Figma Designs */}
+      <Link
+        href="/dashboard/figma"
+        className="flex items-center gap-5 mb-8 p-5 rounded-2xl border border-gray-100 dark:border-white/5 bg-white dark:bg-white/[0.04] hover:shadow-lg hover:shadow-pink-500/5 hover:-translate-y-0.5 transition-all duration-300 group"
+      >
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-pink-500/20">
+          <svg width="24" height="24" viewBox="0 0 38 57" fill="white">
+            <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" />
+            <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" />
+            <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" />
+            <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" />
+            <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" />
+          </svg>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-bold text-gray-900 dark:text-white">Figma Designs</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">ดูดีไซน์จาก Figma ของคุณ — ดึงมาแสดงอัตโนมัติ</p>
+        </div>
+        <span className="text-gray-300 dark:text-gray-600 group-hover:text-pink-500 group-hover:translate-x-1 transition-all text-lg">→</span>
+      </Link>
+
       {/* Canva Templates */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">

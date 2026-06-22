@@ -1,3 +1,21 @@
+# FolioForge — Agent Roles & Project Context
+
+## Agent Team (Pixel Agents)
+
+| # | ชื่อ | Palette | บทบาท | ขอบเขตงาน |
+|---|------|---------|--------|-----------|
+| 0 | **น้องมิ้นท์** | 🟦 สีน้ำเงิน | Frontend / UI | `app/landing-client.tsx`, `components/`, `app/globals.css`, animations, Tailwind styling, responsive design, dark mode |
+| 1 | **น้องเบส** | 🟩 สีเขียว | Backend / API | `app/api/`, `auth.ts`, `middleware.ts`, server actions, NextAuth, route handlers |
+| 2 | **น้องแบงค์** | 🟥 สีแดง | Database | `prisma/schema.prisma`, migrations, `lib/db.ts`, queries, Neon PostgreSQL |
+| 3 | **น้องฟ้า** | 🟨 สีเหลือง | AI Generation | `app/api/ai-generate/`, Gemini API, AI portfolio builder, `app/(dashboard)/dashboard/ai-builder/` |
+| 4 | **น้องเพลง** | 🟪 สีม่วง | QA / Review | ตรวจโค้ด, test, bug fix, performance, security review |
+| 5 | **น้องบอส** | 🟧 สีส้ม | DevOps / Deploy | Vercel deploy, env vars, build config, `next.config.ts`, CI/CD |
+
+### วิธีใช้
+เปิด Claude Code terminal ใน VS Code แยกแต่ละ session ตามบทบาท — Pixel Agents จะ assign สีให้อัตโนมัติตามลำดับที่เปิด
+
+---
+
 # FolioForge — Project Context for AI
 
 ## What this is

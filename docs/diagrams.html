@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FolioForge — Diagrams</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    .header {
+      text-align: center;
+      padding: 3rem 1rem 1rem;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #a78bfa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p { color: #64748b; margin-top: 0.5rem; }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 2rem 1rem 1rem;
+      position: sticky;
+      top: 0;
+      background: #0a0a1a;
+      z-index: 10;
+    }
+    .tab {
+      padding: 0.75rem 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .tab:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+    .tab.active {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+    }
+    .diagram-container {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 2rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      overflow-x: auto;
+    }
+    .diagram-container h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      color: #a78bfa;
+    }
+    .hidden { display: none; }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+    .mermaid svg { max-width: 100%; height: auto; }
+    .export-bar {
+      text-align: center;
+      padding: 1rem;
+    }
+    .export-btn {
+      padding: 0.6rem 1.5rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: #a78bfa;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      margin: 0 0.25rem;
+    }
+    .export-btn:hover {
+      background: rgba(167,139,250,0.15);
+      border-color: rgba(167,139,250,0.3);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #475569;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>FolioForge Diagrams</h1>
+    <p>System Architecture — User Flow — ER Diagram</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="show('userflow')">User Flow</button>
+    <button class="tab" onclick="show('er')">ER Diagram</button>
+  </div>
+
+  <!-- ══════ USER FLOW ══════ -->
+  <div id="userflow" class="diagram-container">
+    <h2>User Flow</h2>
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportSVG('userflow')">Export SVG</button>
+      <button class="export-btn" onclick="exportPNG('userflow')">Export PNG</button>
+    </div>
+    <pre class="mermaid">
+flowchart TD
+    START(("เข้าเว็บ"))
+
+    START --> LANDING["Landing Page"]
+
+    LANDING --> HAS_ACC{"มีบัญชีแล้ว?"}
+
+    HAS_ACC -- ยังไม่มี --> REG["สมัครสมาชิก\nกรอก email / username / password"]
+    REG --> SEND_EMAIL["ส่ง email ยืนยัน\nผ่าน Gmail SMTP"]
+    SEND_EMAIL --> CHECK_EMAIL["เปิด email\nกดลิงก์ยืนยัน"]
+    CHECK_EMAIL --> VERIFIED["ยืนยันสำเร็จ"]
+    VERIFIED --> LOGIN
+
+    HAS_ACC -- มีแล้ว --> LOGIN["เข้าสู่ระบบ\nemail + password"]
+    LOGIN --> AUTH_CHECK{"ข้อมูลถูกต้อง?"}
+    AUTH_CHECK -- ผิด --> LOGIN
+    AUTH_CHECK -- ถูก --> DASHBOARD
+
+    DASHBOARD["Dashboard\nดูภาพรวมโปรเจกต์"]
+    DASHBOARD --> CHOICE{"ต้องการทำอะไร?"}
+
+    CHOICE -- สร้างพอร์ตด้วย AI --> AI_INPUT["กรอกข้อมูลตัวเอง\nชื่อ / โรงเรียน / ทักษะ"]
+    AI_INPUT --> AI_GEN["Gemini AI สร้าง\nพอร์ตโฟลิโอ multi-page"]
+    AI_GEN --> AI_RESULT["ได้พอร์ตหลายหน้า\nAbout / Skills / Projects"]
+    AI_RESULT --> EDIT_PORT["แก้ไขเนื้อหาแต่ละหน้า"]
+    EDIT_PORT --> UPLOAD_IMG
+
+    CHOICE -- เพิ่มโปรเจกต์เอง --> NEW_PROJ["สร้างโปรเจกต์ใหม่\nชื่อ / รายละเอียด / แท็ก"]
+    NEW_PROJ --> UPLOAD_FILE["อัพโหลดไฟล์\nรูปภาพ / เอกสาร"]
+    UPLOAD_FILE --> PROJ_DONE["โปรเจกต์พร้อม\nสาธารณะ / ส่วนตัว"]
+
+    CHOICE -- จัดการรูปพอร์ต --> UPLOAD_IMG["อัพโหลดรูปภาพ\nเกียรติบัตร / กิจกรรม"]
+    UPLOAD_IMG --> BLOB["เก็บใน Vercel Blob"]
+
+    CHOICE -- ดูดีไซน์ Figma --> FIGMA_LIST["รายการไฟล์ Figma"]
+    FIGMA_LIST --> FIGMA_PAGES["ดูหน้าแต่ละหน้า\npreview + ขยายเต็มจอ"]
+    FIGMA_PAGES --> FIGMA_OPEN["เปิดแก้ไขใน Figma"]
+
+    CHOICE -- สร้างใน Canva --> CANVA["เลือก Template"]
+    CANVA --> CANVA_EDIT["เปิดแก้ไขใน Canva"]
+
+    CHOICE -- แก้ไขโปรไฟล์ --> PROFILE["ตั้งค่าโปรไฟล์\nชื่อ / bio / GPA / avatar"]
+
+    CHOICE -- แชร์พอร์ต --> SHARE["ลิงก์สาธารณะ\n/portfolio/username/slug"]
+    SHARE --> PUBLIC_VIEW["ใครก็เปิดดูได้\nSSR + SEO friendly"]
+    SHARE --> EXPORT_PDF["ดาวน์โหลด PDF"]
+
+    style START fill:#6366f1,stroke:#4f46e5,color:#fff
+    style DASHBOARD fill:#6366f1,stroke:#4f46e5,color:#fff
+    style VERIFIED fill:#10b981,stroke:#059669,color:#fff
+    style PROJ_DONE fill:#10b981,stroke:#059669,color:#fff
+    style AI_RESULT fill:#10b981,stroke:#059669,color:#fff
+    style PUBLIC_VIEW fill:#10b981,stroke:#059669,color:#fff
+    style AI_INPUT fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style AI_GEN fill:#8b5cf6,stroke:#7c3aed,color:#fff
+    style FIGMA_LIST fill:#ec4899,stroke:#db2777,color:#fff
+    style FIGMA_PAGES fill:#ec4899,stroke:#db2777,color:#fff
+    style FIGMA_OPEN fill:#ec4899,stroke:#db2777,color:#fff
+    style CANVA fill:#f59e0b,stroke:#d97706,color:#fff
+    style CANVA_EDIT fill:#f59e0b,stroke:#d97706,color:#fff
+    style BLOB fill:#06b6d4,stroke:#0891b2,color:#fff
+    style EXPORT_PDF fill:#06b6d4,stroke:#0891b2,color:#fff
+    </pre>
+  </div>
+
+  <!-- ══════ ER DIAGRAM ══════ -->
+  <div id="er" class="diagram-container hidden">
+    <h2>ER Diagram (Entity Relationship)</h2>
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportSVG('er')">Export SVG</button>
+      <button class="export-btn" onclick="exportPNG('er')">Export PNG</button>
+    </div>
+    <pre class="mermaid">
+erDiagram
+    USER {
+        string id PK
+        string username UK
+        string email UK
+        datetime emailVerified
+        string passwordHash
+        string name
+        string bio
+        string avatarUrl
+        string school
+        string gpa
+        string contactLinks
+        string theme
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PROJECT {
+        string id PK
+        string title
+        string description
+        string tags
+        string externalUrl
+        boolean isPublic
+        datetime date
+        string userId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PROJECT_FILE {
+        string id PK
+        string filename
+        string url
+        string type
+        string projectId FK
+    }
+
+    PORTFOLIO_PAGE {
+        string id PK
+        string title
+        string slug
+        string content
+        int pageOrder
+        boolean isVisible
+        string userId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    VERIFICATION_TOKEN {
+        string id PK
+        string token UK
+        string userId FK
+        datetime expiresAt
+        datetime createdAt
+    }
+
+    USER ||--o{ PROJECT : "1 user : N projects"
+    USER ||--o{ PORTFOLIO_PAGE : "1 user : N pages"
+    USER ||--o{ VERIFICATION_TOKEN : "1 user : N tokens"
+    PROJECT ||--o{ PROJECT_FILE : "1 project : N files"
+    </pre>
+  </div>
+
+  <footer>FolioForge &copy; 2026 — Generated diagrams</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#6366f1',
+        primaryTextColor: '#e2e8f0',
+        primaryBorderColor: '#4f46e5',
+        lineColor: '#64748b',
+        secondaryColor: '#1e1b4b',
+        tertiaryColor: '#0f172a',
+        fontSize: '14px',
+      },
+      flowchart: { curve: 'basis', padding: 20 },
+      er: { fontSize: 14 },
+    });
+
+    function show(id) {
+      document.querySelectorAll('.diagram-container').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function exportSVG(containerId) {
+      const svg = document.querySelector(`#${containerId} .mermaid svg`);
+      if (!svg) return alert('Diagram not found');
+      const data = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([data], { type: 'image/svg+xml' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `folioforge-${containerId}.svg`;
+      a.click();
+    }
+
+    function exportPNG(containerId) {
+      const svg = document.querySelector(`#${containerId} .mermaid svg`);
+      if (!svg) return alert('Diagram not found');
+      const data = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = function () {
+        canvas.width = img.width * 2;
+        canvas.height = img.height * 2;
+        ctx.scale(2, 2);
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `folioforge-${containerId}.png`;
+        a.click();
+      };
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
+    }
+  </script>
+</body>
+</html>
