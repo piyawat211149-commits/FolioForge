@@ -3,7 +3,6 @@ import { useState, Suspense } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { useTheme } from "@/components/theme-provider"
 
 function LoginForm() {
   const router = useRouter()
