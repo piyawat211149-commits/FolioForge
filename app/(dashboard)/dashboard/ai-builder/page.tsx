@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { useLang } from "@/components/language-provider"
 import { useTheme } from "@/components/theme-provider"
 import { FACULTY_THEMES, detectFacultyTheme, getFacultyTheme } from "@/lib/faculty-themes"
