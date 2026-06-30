@@ -685,7 +685,7 @@ export function MultiPagePortfolioClient({ user, pages, currentSlug, currentCont
         </div>
 
         {/* All pages */}
-        {pages.map((pg, pageIdx) => {
+        {pages.map((pg) => {
           const c = pg.content
           const pIcon = pg.slug.includes("intro") || pg.slug.includes("sop") ? "✦"
             : pg.slug.includes("edu") ? "🎓" : pg.slug.includes("activ") ? "🏆"
