@@ -48,5 +48,4 @@ export async function sendVerificationEmail(
     `,
   })
 
-  console.log("[email] Nodemailer send success, messageId:", info.messageId)
 }
